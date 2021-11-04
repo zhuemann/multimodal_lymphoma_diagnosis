@@ -5,7 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 
 from sklearn import model_selection
 
-
+import gc
 from get_id_label_dataframe import get_id_label_dataframe
 from get_id_label_dataframe import get_text_id_labels
 
@@ -31,12 +31,14 @@ class ViTBase16(nn.Module):
         #self.model = timm.create_model("vit_base_patch16_224", pretrained=False)
         self.model = timm.create_model("vit_base_patch16_224", pretrained=True)
         if pretrained:
-            MODEL_PATH = ("C:/Users/zmh001/Documents/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth")
-            # MODEL_PATH = (
-            #    '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth ')
+           # MODEL_PATH = ("C:/Users/zmh001/Documents/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth")
+            MODEL_PATH = ('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
+            
             self.model.load_state_dict(torch.load(MODEL_PATH))
 
-        self.model.head = nn.Linear(self.model.head.in_features, n_classes)
+        #self.model.head = nn.Linear(self.model.head.in_features, n_classes)
+
+        #self.model.head = nn.Linear(self.model.head.in_features, 512)
 
     def forward(self, x):
         x = self.model(x)
@@ -49,13 +51,14 @@ class BERTClass(torch.nn.Module):
         self.l1 = model
         self.pre_classifier = torch.nn.Linear(n_nodes, n_nodes)
         self.dropout = torch.nn.Dropout(0.1)
-        self.classifier = torch.nn.Linear(n_nodes, n_class)
-
+        #self.classifier = torch.nn.Linear(n_nodes, n_class)
+        self.classifier = torch.nn.Linear(n_nodes, 512)
         self.attention = torch.nn.Sequential(
             torch.nn.Linear(768, 512),
             torch.nn.Tanh(),
-            torch.nn.Linear(512, n_class),
-            torch.nn.Softmax(dim=1)
+            torch.nn.Linear(512, 512)
+            #torch.nn.Linear(512, n_class),
+            #torch.nn.Softmax(dim=1)
         )
 
         self.regressor = torch.nn.Sequential(
@@ -67,11 +70,12 @@ class BERTClass(torch.nn.Module):
 
         hidden_state = output_1[0]
         pooler = hidden_state[:, 0]
-        pooler = self.pre_classifier(pooler)
-        pooler = torch.nn.Tanh()(pooler)
-        pooler = self.dropout(pooler)
-        output = self.classifier(pooler)
+        #pooler = self.pre_classifier(pooler)
+        #pooler = torch.nn.Tanh()(pooler)
+        #pooler = self.dropout(pooler)
+        #output = self.classifier(pooler)
 
+        output = pooler
         return output
 
 
@@ -80,13 +84,18 @@ class MyEnsemble(nn.Module):
         super(MyEnsemble, self).__init__()
         self.language_model = language_model
         self.vision_model = vision_model
-        self.classifier = nn.Linear(4, 2)
+        self.classifier = nn.Linear(1024, 1)
+        self.latent_layer1 = nn.Linear(2024, 1024)
+        self.latent_layer2 = nn.Linear(1024, 1024)
 
     def forward(self, input_ids, attention_mask, token_type_ids, images):
         x1 = self.language_model(input_ids, attention_mask, token_type_ids)
         x2 = self.vision_model(images)
         x = torch.cat((x1, x2), dim=1)
         # add relu
+        x = self.latent_layer1(x)
+        x = torch.nn.ReLU()(x)
+        x = self.latent_layer2(x)
         x = self.classifier(x)
         return x
 
@@ -169,6 +178,17 @@ class MIPSDataset(torch.utils.data.Dataset):
 def loss_fn(outputs, targets):
     return torch.nn.BCEWithLogitsLoss()(outputs,targets)
 
+def truncate_left_text_dataset(dataframe, tokenizer):
+    #if we want to only look at the last 512 tokens of a dataset
+
+    for i,row in dataframe.iterrows():
+        tokens = tokenizer.tokenize(row['text'])
+        strings = tokenizer.convert_tokens_to_string( ( tokens[-512:] ) )
+        dataframe.loc[i, 'text'] = strings
+
+    return dataframe
+
+
 class MultiLabelDataset(Dataset):
     def __init__(self, dataframe, tokenizer, max_len):
         self.tokenizer = tokenizer
@@ -208,7 +228,7 @@ class MultiLabelDataset(Dataset):
 
 
 class TextImageDataset(Dataset):
-    def __init__(self, dataframe, tokenizer, max_len, data_path = 'Z:/Lymphoma_UW_Retrospective/Data/mips/', mode="train", transforms = None ):
+    def __init__(self, dataframe, tokenizer, max_len, truncation=True, data_path='/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/', mode="train", transforms = None ):
         self.tokenizer = tokenizer
         self.data = dataframe
         self.text = dataframe.text
@@ -286,10 +306,10 @@ def multimodal_classification():
 
     # model specific global variables
     IMG_SIZE = 224
-    BATCH_SIZE = 16
-    LR = 2e-05
+    BATCH_SIZE = 1
+    LR = 1e-06 #2e-6
     GAMMA = 0.7
-    N_EPOCHS = 5
+    N_EPOCHS = 8 
     N_CLASS = 2
 
     #df = get_id_label_dataframe()
@@ -298,13 +318,19 @@ def multimodal_classification():
     df = df.set_index('id')
     print(df)
 
+    tokenizer = AutoTokenizer.from_pretrained('/home/zmh001/roberta_large/')
+    roberta_model = RobertaModel.from_pretrained("/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/roberta_large/")
+
+    df = truncate_left_text_dataset(df,tokenizer)
+
+
     #Splits the data into 80% train and 20% valid and test sets
     train_df, test_valid_df = model_selection.train_test_split(
-        df, test_size=0.2, random_state=42, stratify=df.label.values
+        df, test_size=0.2, random_state=456, stratify=df.label.values
     )
     #Splits the test and valid sets in half so they are both 10% of total data
     test_df, valid_df = model_selection.train_test_split(
-        test_valid_df, test_size=0.5, random_state=42, stratify=test_valid_df.label.values
+        test_valid_df, test_size=0.5, random_state=456, stratify=test_valid_df.label.values
     )
 
     # create image augmentations
@@ -313,6 +339,7 @@ def multimodal_classification():
             transforms.Resize((IMG_SIZE, IMG_SIZE)),
             transforms.RandomHorizontalFlip(p=0.3),
             transforms.RandomVerticalFlip(p=0.3),
+            transforms.RandomAffine(degrees = 10, translate =(.1,.1), scale = None, shear = None),
             #transforms.RandomResizedCrop(IMG_SIZE),
             transforms.ToTensor(),
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
@@ -359,9 +386,11 @@ def multimodal_classification():
     # criterion = nn.BCEWithLogitsLoss()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    tokenizer = AutoTokenizer.from_pretrained("/Users/zmh001/Documents/language_models/roberta_large/")
-    roberta_model = RobertaModel.from_pretrained("/Users/zmh001/Documents/language_models/roberta_large/")
+    #tokenizer = AutoTokenizer.from_pretrained("/Users/zmh001/Documents/language_models/roberta_large/")
+    #roberta_model = RobertaModel.from_pretrained("/Users/zmh001/Documents/language_models/roberta_large/")
 
+    #tokenizer = AutoTokenizer.from_pretrained('/home/zmh001/roberta_large/')
+    #roberta_model = RobertaModel.from_pretrained("/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/roberta_large/")
 
     training_set = MultiLabelDataset(train_df, tokenizer, 512)
     testing_set = MultiLabelDataset(test_df, tokenizer, 512)
@@ -372,14 +401,14 @@ def multimodal_classification():
     print("TEST Dataset: {}".format(test_df.shape))
     print("VALID Dataset: {}".format(valid_df.shape))
 
-    train_params = {'batch_size': 2,
+    train_params = {'batch_size': 1,
                 'shuffle': True,
-                'num_workers': 1
+                'num_workers': 4
                 }
 
-    test_params = {'batch_size': 2,
+    test_params = {'batch_size': 1,
                     'shuffle': True,
-                    'num_workers': 1
+                    'num_workers': 4
                     }
 
     #training_loader = DataLoader(training_set, **train_params)
@@ -398,80 +427,118 @@ def multimodal_classification():
 
     vit_model = ViTBase16(n_classes=2, pretrained=True)
     #vit_model.to(device)
-    language_model = BERTClass(roberta_model, n_class=2, n_nodes=1024)
+    language_model = BERTClass(roberta_model, n_class=1, n_nodes=1024)
 
     model_obj = MyEnsemble(language_model, vit_model)
     model_obj.to(device)
 
-    optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=1e-5)
-
+    optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
+    best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
+        gc.collect()
+        fin_targets = []
+        fin_outputs = []
+
         for _, data in tqdm(enumerate(training_loader, 0)):
             ids = data['ids'].to(device, dtype=torch.long)
             mask = data['mask'].to(device, dtype=torch.long)
             token_type_ids = data['token_type_ids'].to(device, dtype=torch.long)
             targets = data['targets'].to(device, dtype=torch.float)
-            images = data['images']
+            images = data['images'].to(device)
 
             outputs = model_obj(ids, mask, token_type_ids, images)
+            
+            fin_targets.extend(targets.cpu().detach().numpy().tolist())
+            fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
 
-            print(type(targets))
             # targets = torch.nn.functional.one_hot(input = targets.long(), num_classes = n_classes)
-            print("targets: ")
-            print(targets)
-            print("output")
-            print(outputs)
 
             optimizer.zero_grad()
 
             loss = loss_fn(outputs[:, 0], targets)
 
             if _ % 200 == 0:
-                print(f'Epoch: {1}, Loss:  {loss.item()}')
+                print(f'Epoch: {epoch}, Loss:  {loss.item()}')
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            # each epoch, look at validation data
-            model_obj.eval()
-            fin_targets = []
-            fin_outputs = []
-            with torch.no_grad():
-                for _, data in tqdm(enumerate(valid_loader, 0)):
-                    ids = data['ids'].to(device, dtype=torch.long)
-                    mask = data['mask'].to(device, dtype=torch.long)
-                    token_type_ids = data['token_type_ids'].to(device, dtype=torch.long)
-                    targets = data['targets'].to(device, dtype=torch.float)
-                    images = data['images']
+                 # get the final score
+        if N_CLASS > 2:
+            final_outputs = np.copy(fin_outputs)
+            final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+        else:
+            final_outputs = np.array(fin_outputs) > 0.5
 
-                    outputs = model_obj(ids, mask, token_type_ids, images)
+        accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
+        print(f"Train Accuracy = {accuracy}")
 
-                    fin_targets.extend(targets.cpu().detach().numpy().tolist())
-                    fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
+
+
+
+        # each epoch, look at validation data
+        model_obj.eval()
+        fin_targets = []
+        fin_outputs = []
+        with torch.no_grad():
+            gc.collect()
+            for _, data in tqdm(enumerate(valid_loader, 0)):
+                ids = data['ids'].to(device, dtype=torch.long)
+                mask = data['mask'].to(device, dtype=torch.long)
+                token_type_ids = data['token_type_ids'].to(device, dtype=torch.long)
+                targets = data['targets'].to(device, dtype=torch.float)
+                images = data['images'].to(device)
+
+                outputs = model_obj(ids, mask, token_type_ids, images)
+
+                fin_targets.extend(targets.cpu().detach().numpy().tolist())
+                fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
+            
+            # get the final score
+            if N_CLASS > 2:
+                final_outputs = np.copy(fin_outputs)
+                final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+            else:
                 final_outputs = np.array(fin_outputs) > 0.5
-                val_hamming_loss = metrics.hamming_loss(fin_targets, final_outputs)
-                val_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
+            
+            #final_outputs = np.array(fin_outputs) > 0.5
+            #final_outputs = np.copy(fin_outputs)
+            #final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+            val_hamming_loss = metrics.hamming_loss(fin_targets, final_outputs)
+            val_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
+            
+            accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
+            print(f"valid accuracy = {val_hamming_score}\n Valid Accuracy = {accuracy}")
 
-                print(f"Epoch {str(epoch)}, Validation Hamming Score = {val_hamming_score}")
-                print(f"Epoch {str(epoch)}, Validation Hamming Loss = {val_hamming_loss}")
+            print(f"Epoch {str(epoch)}, Validation Hamming Score = {val_hamming_score}")
+            print(f"Epoch {str(epoch)}, Validation Hamming Loss = {val_hamming_loss}")
+            
+            if accuracy >= best_acc:
+                best_acc = accuracy
+                torch.save(model_obj.state_dict(), '/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal')
+
+
 
     model_obj.eval()
     fin_targets = []
     fin_outputs = []
     row_ids = []
-
+    model_obj.load_state_dict(torch.load('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal'))
     with torch.no_grad():
         for _, data in tqdm(enumerate(test_loader, 0)):
             ids = data['ids'].to(device, dtype = torch.long)
             mask = data['mask'].to(device, dtype = torch.long)
             token_type_ids = data['token_type_ids'].to(device, dtype = torch.long)
             targets = data['targets'].to(device, dtype = torch.float)
-            outputs = model_obj(ids, mask, token_type_ids)
+            images = data['images'].to(device)
+ 
+            outputs = model_obj(ids, mask, token_type_ids, images)
             row_ids.extend(data['row_ids'])
             fin_targets.extend(targets.cpu().detach().numpy().tolist())
             fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
+
 
         #get the final score
         if N_CLASS > 2:
@@ -479,6 +546,7 @@ def multimodal_classification():
             final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
         else:
             final_outputs = np.array(fin_outputs) > 0.5
+
 
         test_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
         accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
