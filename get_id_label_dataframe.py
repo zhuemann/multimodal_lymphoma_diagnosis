@@ -7,10 +7,10 @@ import os
 
 def get_id_label_dataframe():
 
-    negative_dir = 'Z:/Lymphoma_UW_Retrospective/Data/mips/Group_1_2_3_curated'
-    # negative_dir = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/Group_1_2_3_curated'
-    positive_dir = 'Z:/Lymphoma_UW_Retrospective/Data/mips/Group_4_5_curated'
-    # positive_dir = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/Group_4_5_curated'
+    #negative_dir = 'Z:/Lymphoma_UW_Retrospective/Data/mips/Group_1_2_3_curated'
+    negative_dir = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/Group_1_2_3_curated'
+    #positive_dir = 'Z:/Lymphoma_UW_Retrospective/Data/mips/Group_4_5_curated'
+    positive_dir = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/Group_4_5_curated'
 
     # gets all the file names in and puts them in a list
     neg_files = [f for f in listdir(negative_dir) if isfile(join(negative_dir, f))]
@@ -47,7 +47,7 @@ def get_text_id_labels():
 
     report_files = ['ds123_findings_and_impressions_wo_ds_more_syn.csv', 'ds45_findings_and_impressions_wo_ds_more_syn.csv' ]
 
-    report_direct = 'Z:/Zach_Analysis/text_data/'
+    report_direct = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/text_data/'
     df = pd.DataFrame(columns=['id', 'text'])
     for i, file in enumerate(report_files):
         df0 = pd.read_csv(os.path.join(report_direct, file))
