@@ -23,23 +23,25 @@ import timm
 from tqdm import tqdm
 
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from make_u_map import make_u_map
+
 
 class ViTBase16(nn.Module):
-    def __init__(self, n_classes, pretrained=False, dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"):
-
+    def __init__(self, n_classes, pretrained=False, dir_base="/home/zmh001/r-fcb-isilon/research/Bradshaw/"):
         super(ViTBase16, self).__init__()
 
-        #self.model = timm.create_model("vit_base_patch16_224", pretrained=False)
+        # self.model = timm.create_model("vit_base_patch16_224", pretrained=False)
         self.model = timm.create_model("vit_base_patch16_224", pretrained=True)
         if pretrained:
-           # MODEL_PATH = ("C:/Users/zmh001/Documents/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth")
-            #MODEL_PATH = ('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
-            model_path = os.path.join(dir_base, 'Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
+            # MODEL_PATH = ("C:/Users/zmh001/Documents/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth")
+            # MODEL_PATH = ('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
+            model_path = os.path.join(dir_base,
+                                      'Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
             self.model.load_state_dict(torch.load(model_path))
 
-        #self.model.head = nn.Linear(self.model.head.in_features, n_classes)
+        # self.model.head = nn.Linear(self.model.head.in_features, n_classes)
 
-        #self.model.head = nn.Linear(self.model.head.in_features, 512)
+        # self.model.head = nn.Linear(self.model.head.in_features, 512)
 
     def forward(self, x):
         x = self.model(x)
@@ -52,14 +54,14 @@ class BERTClass(torch.nn.Module):
         self.l1 = model
         self.pre_classifier = torch.nn.Linear(n_nodes, n_nodes)
         self.dropout = torch.nn.Dropout(0.1)
-        #self.classifier = torch.nn.Linear(n_nodes, n_class)
+        # self.classifier = torch.nn.Linear(n_nodes, n_class)
         self.classifier = torch.nn.Linear(n_nodes, 512)
         self.attention = torch.nn.Sequential(
             torch.nn.Linear(768, 512),
             torch.nn.Tanh(),
             torch.nn.Linear(512, 512)
-            #torch.nn.Linear(512, n_class),
-            #torch.nn.Softmax(dim=1)
+            # torch.nn.Linear(512, n_class),
+            # torch.nn.Softmax(dim=1)
         )
 
         self.regressor = torch.nn.Sequential(
@@ -71,10 +73,10 @@ class BERTClass(torch.nn.Module):
 
         hidden_state = output_1[0]
         pooler = hidden_state[:, 0]
-        #pooler = self.pre_classifier(pooler)
-        #pooler = torch.nn.Tanh()(pooler)
-        #pooler = self.dropout(pooler)
-        #output = self.classifier(pooler)
+        # pooler = self.pre_classifier(pooler)
+        # pooler = torch.nn.Tanh()(pooler)
+        # pooler = self.dropout(pooler)
+        # output = self.classifier(pooler)
 
         output = pooler
         return output
@@ -92,13 +94,14 @@ class MyEnsemble(nn.Module):
     def forward(self, input_ids, attention_mask, token_type_ids, images):
         x1 = self.language_model(input_ids, attention_mask, token_type_ids)
         x2 = self.vision_model(images)
-        x = torch.cat((x1, x2), dim=1)
+        cat = torch.cat((x1, x2), dim=1)
         # add relu
-        x = self.latent_layer1(x)
-        x = torch.nn.ReLU()(x)
-        x = self.latent_layer2(x)
+        x = self.latent_layer1(cat)
+        activation = torch.nn.ReLU()(x)
+        x = self.latent_layer2(activation)
         x = self.classifier(x)
-        return x
+        return x, x2
+
 
 def compute_metrics(pred):
     labels = pred.label_ids
@@ -112,20 +115,20 @@ def compute_metrics(pred):
         'recall': recall
     }
 
+
 def hamming_score(y_true, y_pred, normalize=True, sample_weight=None):
     acc_list = []
     for i in range(y_true.shape[0]):
-        set_true = set( np.where(y_true[i])[0] )
-        set_pred = set( np.where(y_pred[i])[0] )
+        set_true = set(np.where(y_true[i])[0])
+        set_pred = set(np.where(y_pred[i])[0])
         tmp_a = None
         if len(set_true) == 0 and len(set_pred) == 0:
             tmp_a = 1
         else:
-            tmp_a = len(set_true.intersection(set_pred))/\
-                    float( len(set_true.union(set_pred)) )
+            tmp_a = len(set_true.intersection(set_pred)) / \
+                    float(len(set_true.union(set_pred)))
         acc_list.append(tmp_a)
     return np.mean(acc_list)
-
 
 
 class MIPSDataset(torch.utils.data.Dataset):
@@ -140,7 +143,7 @@ class MIPSDataset(torch.utils.data.Dataset):
         self.transforms = transforms
         self.mode = mode
 
-        #self.data_dir = "train_images" if mode == "train" else "test_images"
+        # self.data_dir = "train_images" if mode == "train" else "test_images"
 
     def __len__(self):
         return len(self.df_data)
@@ -165,7 +168,7 @@ class MIPSDataset(torch.utils.data.Dataset):
         if self.transforms is not None:
             image = self.transforms(img)
             try:
-                #image = self.transforms(img)
+                # image = self.transforms(img)
                 image = self.transforms(img)
             except:
                 print("can't transform")
@@ -177,14 +180,15 @@ class MIPSDataset(torch.utils.data.Dataset):
 
 
 def loss_fn(outputs, targets):
-    return torch.nn.BCEWithLogitsLoss()(outputs,targets)
+    return torch.nn.BCEWithLogitsLoss()(outputs, targets)
+
 
 def truncate_left_text_dataset(dataframe, tokenizer):
-    #if we want to only look at the last 512 tokens of a dataset
+    # if we want to only look at the last 512 tokens of a dataset
 
-    for i,row in dataframe.iterrows():
+    for i, row in dataframe.iterrows():
         tokens = tokenizer.tokenize(row['text'])
-        strings = tokenizer.convert_tokens_to_string( ( tokens[-512:] ) )
+        strings = tokenizer.convert_tokens_to_string((tokens[-512:]))
         dataframe.loc[i, 'text'] = strings
 
     return dataframe
@@ -218,7 +222,6 @@ class MultiLabelDataset(Dataset):
         mask = inputs['attention_mask']
         token_type_ids = inputs["token_type_ids"]
 
-
         return {
             'ids': torch.tensor(ids, dtype=torch.long),
             'mask': torch.tensor(mask, dtype=torch.long),
@@ -229,7 +232,9 @@ class MultiLabelDataset(Dataset):
 
 
 class TextImageDataset(Dataset):
-    def __init__(self, dataframe, tokenizer, max_len, truncation=True, dir_base='/home/zmh001/r-fcb-isilon/research/Bradshaw/', mode="train", transforms = None): # data_path = os.path.join(dir_base,'Lymphoma_UW_Retrospective/Data/mips/')
+    def __init__(self, dataframe, tokenizer, max_len, truncation=True,
+                 dir_base='/home/zmh001/r-fcb-isilon/research/Bradshaw/', mode="train",
+                 transforms=None):  # data_path = os.path.join(dir_base,'Lymphoma_UW_Retrospective/Data/mips/')
         self.tokenizer = tokenizer
         self.data = dataframe
         self.text = dataframe.text
@@ -241,7 +246,7 @@ class TextImageDataset(Dataset):
         # self.data_path = data_path
         self.transforms = transforms
         self.mode = mode
-        self.data_path = os.path.join(dir_base,'Lymphoma_UW_Retrospective/Data/mips/')
+        self.data_path = os.path.join(dir_base, 'Lymphoma_UW_Retrospective/Data/mips/')
 
     def __len__(self):
         return len(self.text)
@@ -293,7 +298,6 @@ class TextImageDataset(Dataset):
         else:
             image = img
 
-
         return {
             'ids': torch.tensor(ids, dtype=torch.long),
             'mask': torch.tensor(mask, dtype=torch.long),
@@ -304,19 +308,18 @@ class TextImageDataset(Dataset):
         }
 
 
-def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"):
-
+def multimodal_u_maps(dir_base="/home/zmh001/r-fcb-isilon/research/Bradshaw/"):
     # model specific global variables
     IMG_SIZE = 224
     BATCH_SIZE = 1
-    LR = 1e-06 #2e-6
+    LR = 1e-06  # 2e-6
     GAMMA = 0.7
-    N_EPOCHS = 1#8
+    N_EPOCHS = 1  # 8
     N_CLASS = 2
 
-    #df = get_id_label_dataframe()
-    #print(df)
-    #print(f"dir_base is: {dir_base}")
+    # df = get_id_label_dataframe()
+    # print(df)
+    # print(f"dir_base is: {dir_base}")
     # creates the label, text, and image names in a dataframe
     df = get_text_id_labels(dir_base=dir_base)
     df = df.set_index('id')
@@ -330,13 +333,13 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
     # takes just the last 512 tokens if there are more than 512 tokens in the text
     df = truncate_left_text_dataset(df, tokenizer)
 
-    #Splits the data into 80% train and 20% valid and test sets
+    # Splits the data into 80% train and 20% valid and test sets
     train_df, test_valid_df = model_selection.train_test_split(
         df, test_size=0.2, random_state=456, stratify=df.label.values
     )
-    #Splits the test and valid sets in half so they are both 10% of total data
+    # Splits the test and valid sets in half so they are both 10% of total data
     test_df, valid_df = model_selection.train_test_split(
-        test_valid_df, test_size=0.5, random_state=456, stratify=test_valid_df.label.values
+        test_valid_df, test_size=.3, random_state=456, stratify=test_valid_df.label.values
     )
 
     # create image augmentations
@@ -345,8 +348,8 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
             transforms.Resize((IMG_SIZE, IMG_SIZE)),
             transforms.RandomHorizontalFlip(p=0.3),
             transforms.RandomVerticalFlip(p=0.3),
-            transforms.RandomAffine(degrees = 10, translate =(.1,.1), scale = None, shear = None),
-            #transforms.RandomResizedCrop(IMG_SIZE),
+            transforms.RandomAffine(degrees=10, translate=(.1, .1), scale=None, shear=None),
+            # transforms.RandomResizedCrop(IMG_SIZE),
             transforms.ToTensor(),
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
         ]
@@ -405,27 +408,28 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
     print("VALID Dataset: {}".format(valid_df.shape))
 
     train_params = {'batch_size': 1,
-                'shuffle': True,
-                'num_workers': 4
-                }
-
-    test_params = {'batch_size': 1,
                     'shuffle': True,
                     'num_workers': 4
                     }
 
+    test_params = {'batch_size': 1,
+                   'shuffle': True,
+                   'num_workers': 4
+                   }
+
     # should be able to delete these
-    #training_loader = DataLoader(training_set, **train_params)
-    #testing_loader = DataLoader(testing_set, **test_params)
-    #valid_loader = DataLoader(valid_set, **test_params)
+    # training_loader = DataLoader(training_set, **train_params)
+    # testing_loader = DataLoader(testing_set, **test_params)
+    # valid_loader = DataLoader(valid_set, **test_params)
     print(dir_base)
-    training_set = TextImageDataset(train_df, tokenizer, 512, mode="train", transforms = transforms_train, dir_base = dir_base)
+    training_set = TextImageDataset(train_df, tokenizer, 512, mode="train", transforms=transforms_train,
+                                    dir_base=dir_base)
     training_loader = DataLoader(training_set, **train_params)
 
-    valid_set = TextImageDataset(valid_df, tokenizer, 512, transforms = transforms_valid, dir_base = dir_base)
+    valid_set = TextImageDataset(valid_df, tokenizer, 512, transforms=transforms_valid, dir_base=dir_base)
     valid_loader = DataLoader(valid_set, **test_params)
 
-    test_set = TextImageDataset(test_df, tokenizer, 512, transforms = transforms_valid, dir_base = dir_base)
+    test_set = TextImageDataset(test_df, tokenizer, 512, transforms=transforms_valid, dir_base=dir_base)
     test_loader = DataLoader(test_set, **test_params)
 
     # creates the vit model which gets passed to the multimodal model class
@@ -440,51 +444,23 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
     best_acc = -1
+
+    save_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
+    model_obj.load_state_dict(torch.load(save_path, map_location=torch.device('cpu')))
+
+    print("starting epoch loop")
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
         gc.collect()
-        fin_targets = []
-        fin_outputs = []
 
-        for _, data in tqdm(enumerate(training_loader, 0)):
-            ids = data['ids'].to(device, dtype=torch.long)
-            mask = data['mask'].to(device, dtype=torch.long)
-            token_type_ids = data['token_type_ids'].to(device, dtype=torch.long)
-            targets = data['targets'].to(device, dtype=torch.float)
-            images = data['images'].to(device)
-
-            outputs = model_obj(ids, mask, token_type_ids, images)
-            
-            fin_targets.extend(targets.cpu().detach().numpy().tolist())
-            fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
-
-            # targets = torch.nn.functional.one_hot(input = targets.long(), num_classes = n_classes)
-
-            optimizer.zero_grad()
-
-            loss = loss_fn(outputs[:, 0], targets)
-
-            if _ % 200 == 0:
-                print(f'Epoch: {epoch}, Loss:  {loss.item()}')
-
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-                 # get the final score
-        if N_CLASS > 2:
-            final_outputs = np.copy(fin_outputs)
-            final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
-        else:
-            final_outputs = np.array(fin_outputs) > 0.5
-
-        accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
-        print(f"Train Accuracy = {accuracy}")
 
         # each epoch, look at validation data
         model_obj.eval()
         fin_targets = []
         fin_outputs = []
+        all_trans_outputs = []
+        all_targets = []
+
         with torch.no_grad():
             gc.collect()
             for _, data in tqdm(enumerate(valid_loader, 0)):
@@ -494,35 +470,46 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
                 targets = data['targets'].to(device, dtype=torch.float)
                 images = data['images'].to(device)
 
-                outputs = model_obj(ids, mask, token_type_ids, images)
+                outputs,trans_output  = model_obj(ids, mask, token_type_ids, images)
+
+                print(type(trans_output.numpy()))
+                print(trans_output.numpy())
+
+                all_trans_outputs.append(trans_output.numpy())
+                all_targets.append(targets.numpy())
 
                 fin_targets.extend(targets.cpu().detach().numpy().tolist())
                 fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
-            
+
             # get the final score
             if N_CLASS > 2:
                 final_outputs = np.copy(fin_outputs)
-                final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+                final_outputs = (final_outputs == final_outputs.max(axis=1)[:, None]).astype(int)
             else:
                 final_outputs = np.array(fin_outputs) > 0.5
-            
-            #final_outputs = np.array(fin_outputs) > 0.5
-            #final_outputs = np.copy(fin_outputs)
-            #final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+
+            # final_outputs = np.array(fin_outputs) > 0.5
+            # final_outputs = np.copy(fin_outputs)
+            # final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
             val_hamming_loss = metrics.hamming_loss(fin_targets, final_outputs)
             val_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
-            
+
             accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
             print(f"valid accuracy = {val_hamming_score}\n Valid Accuracy = {accuracy}")
 
             print(f"Epoch {str(epoch)}, Validation Hamming Score = {val_hamming_score}")
             print(f"Epoch {str(epoch)}, Validation Hamming Loss = {val_hamming_loss}")
-            
+
             if accuracy >= best_acc:
                 best_acc = accuracy
-                save_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
-                #torch.save(model_obj.state_dict(), '/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal')
-                torch.save(model_obj.state_dict(), save_path)
+                #save_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
+                # torch.save(model_obj.state_dict(), '/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal')
+                #torch.save(model_obj.state_dict(), save_path)
+
+
+    print(all_trans_outputs)
+    make_u_map(all_targets, all_targets)
+
 
 
     model_obj.eval()
@@ -530,43 +517,45 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
     fin_outputs = []
     row_ids = []
     saved_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
-    #model_obj.load_state_dict(torch.load('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal'))
+    # model_obj.load_state_dict(torch.load('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal'))
     model_obj.load_state_dict(torch.load(saved_path))
 
     with torch.no_grad():
         for _, data in tqdm(enumerate(test_loader, 0)):
-            ids = data['ids'].to(device, dtype = torch.long)
-            mask = data['mask'].to(device, dtype = torch.long)
-            token_type_ids = data['token_type_ids'].to(device, dtype = torch.long)
-            targets = data['targets'].to(device, dtype = torch.float)
+            ids = data['ids'].to(device, dtype=torch.long)
+            mask = data['mask'].to(device, dtype=torch.long)
+            token_type_ids = data['token_type_ids'].to(device, dtype=torch.long)
+            targets = data['targets'].to(device, dtype=torch.float)
             images = data['images'].to(device)
- 
+
             outputs = model_obj(ids, mask, token_type_ids, images)
             row_ids.extend(data['row_ids'])
             fin_targets.extend(targets.cpu().detach().numpy().tolist())
             fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
 
-
-        #get the final score
+        # get the final score
         if N_CLASS > 2:
             final_outputs = np.copy(fin_outputs)
-            final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+            final_outputs = (final_outputs == final_outputs.max(axis=1)[:, None]).astype(int)
         else:
             final_outputs = np.array(fin_outputs) > 0.5
-
 
         test_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
         accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
         print(f"Test Hamming Score = {test_hamming_score}\nTest Accuracy = {accuracy}")
-        #print(f"Test Hamming Score = {test_hamming_score}\nTest Accuracy = {accuracy}\n{model_type[model_selection] + save_name_extension}")
+        # print(f"Test Hamming Score = {test_hamming_score}\nTest Accuracy = {accuracy}\n{model_type[model_selection] + save_name_extension}")
 
-        #create a dataframe of the prediction, labels, and which ones are correct
+        # create a dataframe of the prediction, labels, and which ones are correct
         if N_CLASS > 2:
-            df_test_vals = pd.DataFrame(list(zip(row_ids, np.argmax(fin_targets, axis=1).astype(int).tolist(), np.argmax(final_outputs, axis=1).astype(int).tolist())), columns=['id', 'label', 'prediction'])
+            df_test_vals = pd.DataFrame(list(zip(row_ids, np.argmax(fin_targets, axis=1).astype(int).tolist(),
+                                                 np.argmax(final_outputs, axis=1).astype(int).tolist())),
+                                        columns=['id', 'label', 'prediction'])
         else:
-            df_test_vals = pd.DataFrame(list(zip(row_ids, list(map(int, fin_targets)), final_outputs[:,0].astype(int).tolist())), columns=['id', 'label', 'prediction'])
+            df_test_vals = pd.DataFrame(
+                list(zip(row_ids, list(map(int, fin_targets)), final_outputs[:, 0].astype(int).tolist())),
+                columns=['id', 'label', 'prediction'])
             # df_test_vals['correct'] = df_test_vals['label'].equals(df_test_vals['prediction'])
-        df_test_vals['correct'] = np.where( df_test_vals['label'] == df_test_vals['prediction'], 1, 0)
+        df_test_vals['correct'] = np.where(df_test_vals['label'] == df_test_vals['prediction'], 1, 0)
         df_test_vals = df_test_vals.sort_values('id')
         df_test_vals = df_test_vals.set_index('id')
 

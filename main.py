@@ -7,15 +7,24 @@ from vit_train import vit_train
 from classification_model_bert_unchanged import fine_tune_model, test_saved_model
 from get_id_label_dataframe import get_id_label_dataframe
 from multimodal_classifcation import multimodal_classification
-
+from make_u_map import make_u_map
+from u_map_embedded_layers import multimodal_u_maps
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
     #vit_train()
 
-    multimodal_classification()
+    local = True
+    if local == True:
+        directory_base = "Z:/"
+    else:
+        directory_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"
 
+
+    #multimodal_classification(dir_base = directory_base)
+    multimodal_u_maps(dir_base = directory_base)
+    #make_u_map()
 
     Fine_Tune = False
     if Fine_Tune == True:

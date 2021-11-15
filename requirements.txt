@@ -13,3 +13,6 @@ wandb
 
 #NLP packages
 transformers
+
+umap-learn
+seaborn

@@ -5,12 +5,15 @@ import numpy as np
 import pandas as pd
 import os
 
-def get_id_label_dataframe():
+def get_id_label_dataframe(dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"):
 
     #negative_dir = 'Z:/Lymphoma_UW_Retrospective/Data/mips/Group_1_2_3_curated'
-    negative_dir = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/Group_1_2_3_curated'
+    #negative_dir = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/Group_1_2_3_curated'
     #positive_dir = 'Z:/Lymphoma_UW_Retrospective/Data/mips/Group_4_5_curated'
-    positive_dir = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/Group_4_5_curated'
+    #positive_dir = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Lymphoma_UW_Retrospective/Data/mips/Group_4_5_curated'
+
+    negative_dir = os.path.join(dir_base, 'Lymphoma_UW_Retrospective/Data/mips/Group_1_2_3_curated')
+    positive_dir = os.path.join(dir_base, 'Lymphoma_UW_Retrospective/Data/mips/Group_4_5_curated')
 
     # gets all the file names in and puts them in a list
     neg_files = [f for f in listdir(negative_dir) if isfile(join(negative_dir, f))]
@@ -43,11 +46,12 @@ def get_id_label_dataframe():
 
     return df
 
-def get_text_id_labels():
+def get_text_id_labels(dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"):
 
     report_files = ['ds123_findings_and_impressions_wo_ds_more_syn.csv', 'ds45_findings_and_impressions_wo_ds_more_syn.csv' ]
 
-    report_direct = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/text_data/'
+    #report_direct = '/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/text_data/'
+    report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data')
     df = pd.DataFrame(columns=['id', 'text'])
     for i, file in enumerate(report_files):
         df0 = pd.read_csv(os.path.join(report_direct, file))
@@ -60,18 +64,14 @@ def get_text_id_labels():
 
         df = pd.concat([df, df0], axis=0, join='outer')
 
-    print("before getting and cutting df_images")
     # get list of image files
-    df_images = get_id_label_dataframe()
-    print("after getting image dataframe")
+    df_images = get_id_label_dataframe(dir_base = dir_base)
     df_images["image_id"] = df_images["image_id"].str.replace(r'_mip.png', '')
-    print("before merge")
 
     df = df.merge(df_images, left_on='id', right_on='image_id')
-    #df = df.drop(columns=['labels'])
     df = df.drop_duplicates(subset=["id"])
-    print(df)
-    print(df.head())
-    df.head()
+    # print(df)
+    # print(df.head())
+    # df.head()
 
     return df
