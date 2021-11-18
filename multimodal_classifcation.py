@@ -31,14 +31,17 @@ class ViTBase16(nn.Module):
         super(ViTBase16, self).__init__()
 
         #self.model = timm.create_model("vit_base_patch16_224", pretrained=False)
-        self.model = timm.create_model("vit_base_patch16_224", pretrained=True)
+        self.model = timm.create_model("vit_base_patch16_224", pretrained=False)
+
+        pretrained = True
         if pretrained:
            # MODEL_PATH = ("C:/Users/zmh001/Documents/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth")
             #MODEL_PATH = ('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
             model_path = os.path.join(dir_base, 'Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
             self.model.load_state_dict(torch.load(model_path))
             print("is using the wieghts stored at this location")
-
+        else:
+            print("doesn't use saved weights, using random weights in vision")
         #self.model.head = nn.Linear(self.model.head.in_features, n_classes)
 
         #self.model.head = nn.Linear(self.model.head.in_features, 512)
