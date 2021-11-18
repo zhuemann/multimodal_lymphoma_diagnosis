@@ -23,6 +23,7 @@ import timm
 from tqdm import tqdm
 
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from five_class_setup import five_class_image_text_label
 
 class ViTBase16(nn.Module):
     def __init__(self, n_classes, pretrained=False, dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"):
@@ -36,6 +37,7 @@ class ViTBase16(nn.Module):
             #MODEL_PATH = ('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
             model_path = os.path.join(dir_base, 'Zach_Analysis/vit_model/jx_vit_base_p16_224-80ecf9dd.pth/jx_vit_base_p16_224-80ecf9dd.pth')
             self.model.load_state_dict(torch.load(model_path))
+            print("is using the wieghts stored at this location")
 
         #self.model.head = nn.Linear(self.model.head.in_features, n_classes)
 
@@ -81,11 +83,11 @@ class BERTClass(torch.nn.Module):
 
 
 class MyEnsemble(nn.Module):
-    def __init__(self, language_model, vision_model):
+    def __init__(self, language_model, vision_model, n_classes):
         super(MyEnsemble, self).__init__()
         self.language_model = language_model
         self.vision_model = vision_model
-        self.classifier = nn.Linear(1024, 1)
+        self.classifier = nn.Linear(1024, n_classes)
         self.latent_layer1 = nn.Linear(2024, 1024)
         self.latent_layer2 = nn.Linear(1024, 1024)
 
@@ -304,7 +306,7 @@ class TextImageDataset(Dataset):
         }
 
 
-def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"):
+def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/",n_classes = 2):
 
     # model specific global variables
     IMG_SIZE = 224
@@ -312,14 +314,17 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
     LR = 1e-06 #2e-6
     GAMMA = 0.7
     N_EPOCHS = 1#8
-    N_CLASS = 2
+    N_CLASS = n_classes
 
-    #df = get_id_label_dataframe()
-    #print(df)
-    #print(f"dir_base is: {dir_base}")
+    # df = get_id_label_dataframe()
+    # print(df)
+    # print(f"dir_base is: {dir_base}")
     # creates the label, text, and image names in a dataframe
-    df = get_text_id_labels(dir_base=dir_base)
-    df = df.set_index('id')
+    # df = get_text_id_labels(dir_base=dir_base)
+    # df = df.set_index('id')
+
+    # creates the label, text, and image names in a dataframe
+    df = five_class_image_text_label(dir_base=dir_base)
     print(df)
 
     # creates the path to the roberta model used from the bradshaw drive and loads the tokenizer and roberta model
@@ -429,12 +434,12 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
     test_loader = DataLoader(test_set, **test_params)
 
     # creates the vit model which gets passed to the multimodal model class
-    vit_model = ViTBase16(n_classes=2, pretrained=True, dir_base=dir_base)
+    vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
     # creates the language model which gets passed to the multimodal model class
-    language_model = BERTClass(roberta_model, n_class=1, n_nodes=1024)
+    language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=1024)
 
     # creates the multimodal modal from the langauge and vision model and moves it to device
-    model_obj = MyEnsemble(language_model, vit_model)
+    model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS)
     model_obj.to(device)
 
     # defines which optimizer is being used

@@ -9,6 +9,7 @@ from get_id_label_dataframe import get_id_label_dataframe
 from multimodal_classifcation import multimodal_classification
 from make_u_map import make_u_map
 from u_map_embedded_layers import multimodal_u_maps
+from five_class_setup import five_class_image_text_label
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -21,9 +22,14 @@ if __name__ == '__main__':
     else:
         directory_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"
 
+    DGX = False
+    if DGX == True:
+        directory_base = "/UserData/"
 
-    #multimodal_classification(dir_base = directory_base)
-    multimodal_u_maps(dir_base = directory_base)
+    #test = five_class_image_text_label()
+    #print(test)
+    multimodal_classification(dir_base = directory_base, n_classes = 5)
+    #multimodal_u_maps(dir_base = directory_base)
     #make_u_map()
 
     Fine_Tune = False
