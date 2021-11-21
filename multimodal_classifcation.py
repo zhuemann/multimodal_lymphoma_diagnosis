@@ -313,16 +313,16 @@ class TextImageDataset(Dataset):
         }
 
 
-def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/",n_classes = 2):
+def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/",n_classes = 2):
 
     # model specific global variables
     IMG_SIZE = 224
-    BATCH_SIZE = 8
+    BATCH_SIZE = batch_size
     LR = 1e-06 #2e-6
     GAMMA = 0.7
-    N_EPOCHS = 40#8
+    N_EPOCHS = epoch #8
     N_CLASS = n_classes
-    seed = 1111
+    seed = seed
 
     # df = get_id_label_dataframe()
     # print(df)
@@ -607,6 +607,8 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
         accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
         print(f"Test Hamming Score = {test_hamming_score}\nTest Accuracy = {accuracy}")
         print(confusion_matrix)
+
+        return accuracy, confusion_matrix
         #print(f"Test Hamming Score = {test_hamming_score}\nTest Accuracy = {accuracy}\n{model_type[model_selection] + save_name_extension}")
 
         #create a dataframe of the prediction, labels, and which ones are correct

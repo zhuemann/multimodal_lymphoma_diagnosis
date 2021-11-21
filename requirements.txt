@@ -16,3 +16,4 @@ transformers
 
 umap-learn
 seaborn
+openpyxl
