@@ -182,7 +182,11 @@ class MIPSDataset(torch.utils.data.Dataset):
 
 
 def loss_fn(outputs, targets):
-    return torch.nn.BCEWithLogitsLoss()(outputs,targets)
+    print(outputs)
+    print(targets)
+    #return nn.CrossEntropyLoss()(outputs, targets)
+    return nn.MSELoss(outputs, targets)
+    #return torch.nn.BCEWithLogitsLoss()(outputs,targets)
 
 def truncate_left_text_dataset(dataframe, tokenizer):
     #if we want to only look at the last 512 tokens of a dataset
@@ -313,11 +317,12 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
 
     # model specific global variables
     IMG_SIZE = 224
-    BATCH_SIZE = 1
+    BATCH_SIZE = 8
     LR = 1e-06 #2e-6
     GAMMA = 0.7
-    N_EPOCHS = 1#8
+    N_EPOCHS = 40#8
     N_CLASS = n_classes
+    seed = 1111
 
     # df = get_id_label_dataframe()
     # print(df)
@@ -340,11 +345,11 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
 
     #Splits the data into 80% train and 20% valid and test sets
     train_df, test_valid_df = model_selection.train_test_split(
-        df, test_size=0.2, random_state=456, stratify=df.label.values
+        df, test_size=0.3, random_state=seed, stratify=df.label.values
     )
     #Splits the test and valid sets in half so they are both 10% of total data
     test_df, valid_df = model_selection.train_test_split(
-        test_valid_df, test_size=0.5, random_state=456, stratify=test_valid_df.label.values
+        test_valid_df, test_size=0.5, random_state=seed, stratify=test_valid_df.label.values
     )
 
     # create image augmentations
@@ -399,6 +404,8 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
 
     # probably can delete these
     criterion = nn.CrossEntropyLoss()
+    #criterion = nn.MSELoss()
+    #criterion = nn.SmoothL1Loss()
     # criterion = nn.BCEWithLogitsLoss()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -412,12 +419,12 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
     print("TEST Dataset: {}".format(test_df.shape))
     print("VALID Dataset: {}".format(valid_df.shape))
 
-    train_params = {'batch_size': 1,
+    train_params = {'batch_size': BATCH_SIZE,
                 'shuffle': True,
                 'num_workers': 4
                 }
 
-    test_params = {'batch_size': 1,
+    test_params = {'batch_size': BATCH_SIZE,
                     'shuffle': True,
                     'num_workers': 4
                     }
@@ -453,64 +460,88 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
         gc.collect()
         fin_targets = []
         fin_outputs = []
+        confusion_matrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
+
 
         for _, data in tqdm(enumerate(training_loader, 0)):
             ids = data['ids'].to(device, dtype=torch.long)
             mask = data['mask'].to(device, dtype=torch.long)
             token_type_ids = data['token_type_ids'].to(device, dtype=torch.long)
-            targets = data['targets'].to(device, dtype=torch.float)
+            targets = data['targets'].to(device, dtype=torch.long)
             images = data['images'].to(device)
 
             outputs = model_obj(ids, mask, token_type_ids, images)
-            
+             
             fin_targets.extend(targets.cpu().detach().numpy().tolist())
             fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
-
+            # fin_outputs.extend(outputs.cpu().detach().numpy().tolist())
             # targets = torch.nn.functional.one_hot(input = targets.long(), num_classes = n_classes)
-
+            
             optimizer.zero_grad()
-
-            loss = loss_fn(outputs[:, 0], targets)
-
-            if _ % 200 == 0:
+            #loss = loss_fn(outputs[:, 0], targets)
+            loss = criterion(outputs,targets)
+            if _ % 50 == 0:
                 print(f'Epoch: {epoch}, Loss:  {loss.item()}')
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-                 # get the final score
+            for i in range(0,outputs.shape[0]):
+                actual = targets[i].detach().cpu().data.numpy()
+                predicted = outputs.argmax(dim=1)[i].detach().cpu().data.numpy()
+                confusion_matrix[predicted][actual] += 1
+
+
+        # get the final score
         if N_CLASS > 2:
             final_outputs = np.copy(fin_outputs)
-            final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+            #final_outputs = np.round(final_outputs, decimals=0)
+            #final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+            final_outputs = np.argmax(final_outputs, axis=1)
         else:
             final_outputs = np.array(fin_outputs) > 0.5
 
+        #print(final_outputs.tolist())
+        #print(fin_targets)
         accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
         print(f"Train Accuracy = {accuracy}")
+        print(confusion_matrix)
 
         # each epoch, look at validation data
         model_obj.eval()
         fin_targets = []
         fin_outputs = []
+        confusion_matrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
+
         with torch.no_grad():
             gc.collect()
             for _, data in tqdm(enumerate(valid_loader, 0)):
                 ids = data['ids'].to(device, dtype=torch.long)
                 mask = data['mask'].to(device, dtype=torch.long)
                 token_type_ids = data['token_type_ids'].to(device, dtype=torch.long)
-                targets = data['targets'].to(device, dtype=torch.float)
+                targets = data['targets'].to(device, dtype=torch.long)
                 images = data['images'].to(device)
 
                 outputs = model_obj(ids, mask, token_type_ids, images)
 
                 fin_targets.extend(targets.cpu().detach().numpy().tolist())
-                fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
-            
+                fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist()) #for two class
+                #fin_outputs.extend(outputs.cpu().detach().numpy().tolist())
+                
+                for i in range(0,outputs.shape[0]):
+                    actual = targets[i].detach().cpu().data.numpy()
+                    predicted = outputs.argmax(dim=1)[i].detach().cpu().data.numpy()
+                    confusion_matrix[predicted][actual] += 1
+
+
+
             # get the final score
             if N_CLASS > 2:
                 final_outputs = np.copy(fin_outputs)
-                final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+                #final_outputs = np.round(final_outputs, decimals=0)
+                final_outputs = np.argmax(final_outputs, axis=1)
+                #final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
             else:
                 final_outputs = np.array(fin_outputs) > 0.5
             
@@ -521,11 +552,11 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
             val_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
             
             accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
-            print(f"valid accuracy = {val_hamming_score}\n Valid Accuracy = {accuracy}")
+            print(f"valid Hamming Score = {val_hamming_score}\nValid Accuracy = {accuracy}")
 
             print(f"Epoch {str(epoch)}, Validation Hamming Score = {val_hamming_score}")
             print(f"Epoch {str(epoch)}, Validation Hamming Loss = {val_hamming_loss}")
-            
+            print(confusion_matrix)
             if accuracy >= best_acc:
                 best_acc = accuracy
                 save_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
@@ -537,6 +568,7 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
     fin_targets = []
     fin_outputs = []
     row_ids = []
+    confusion_matrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
     saved_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
     #model_obj.load_state_dict(torch.load('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal'))
     model_obj.load_state_dict(torch.load(saved_path))
@@ -546,19 +578,27 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
             ids = data['ids'].to(device, dtype = torch.long)
             mask = data['mask'].to(device, dtype = torch.long)
             token_type_ids = data['token_type_ids'].to(device, dtype = torch.long)
-            targets = data['targets'].to(device, dtype = torch.float)
+            targets = data['targets'].to(device, dtype = torch.long)
             images = data['images'].to(device)
  
             outputs = model_obj(ids, mask, token_type_ids, images)
             row_ids.extend(data['row_ids'])
             fin_targets.extend(targets.cpu().detach().numpy().tolist())
-            fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
+            fin_outputs.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist()) #for two class
+            #fin_outputs.extend(outputs.cpu().detach().numpy().tolist())
+
+            for i in range(0,outputs.shape[0]):
+                actual = targets[i].detach().cpu().data.numpy()
+                predicted = outputs.argmax(dim=1)[i].detach().cpu().data.numpy()
+                confusion_matrix[predicted][actual] += 1
 
 
         #get the final score
         if N_CLASS > 2:
             final_outputs = np.copy(fin_outputs)
-            final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
+            final_outputs = np.argmax(final_outputs, axis=1)
+            #final_outputs = np.round(final_outputs, decimals=0)
+            #final_outputs = (final_outputs == final_outputs.max(axis=1)[:,None]).astype(int)
         else:
             final_outputs = np.array(fin_outputs) > 0.5
 
@@ -566,15 +606,16 @@ def multimodal_classification(dir_base = "/home/zmh001/r-fcb-isilon/research/Bra
         test_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
         accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
         print(f"Test Hamming Score = {test_hamming_score}\nTest Accuracy = {accuracy}")
+        print(confusion_matrix)
         #print(f"Test Hamming Score = {test_hamming_score}\nTest Accuracy = {accuracy}\n{model_type[model_selection] + save_name_extension}")
 
         #create a dataframe of the prediction, labels, and which ones are correct
-        if N_CLASS > 2:
-            df_test_vals = pd.DataFrame(list(zip(row_ids, np.argmax(fin_targets, axis=1).astype(int).tolist(), np.argmax(final_outputs, axis=1).astype(int).tolist())), columns=['id', 'label', 'prediction'])
-        else:
-            df_test_vals = pd.DataFrame(list(zip(row_ids, list(map(int, fin_targets)), final_outputs[:,0].astype(int).tolist())), columns=['id', 'label', 'prediction'])
+        #if N_CLASS > 2:
+        #    df_test_vals = pd.DataFrame(list(zip(row_ids, np.argmax(fin_targets, axis=1).astype(int).tolist(), np.argmax(final_outputs, axis=1).astype(int).tolist())), columns=['id', 'label', 'prediction'])
+        #else:
+        #    df_test_vals = pd.DataFrame(list(zip(row_ids, list(map(int, fin_targets)), final_outputs[:,0].astype(int).tolist())), columns=['id', 'label', 'prediction'])
             # df_test_vals['correct'] = df_test_vals['label'].equals(df_test_vals['prediction'])
-        df_test_vals['correct'] = np.where( df_test_vals['label'] == df_test_vals['prediction'], 1, 0)
-        df_test_vals = df_test_vals.sort_values('id')
-        df_test_vals = df_test_vals.set_index('id')
+        #df_test_vals['correct'] = np.where( df_test_vals['label'] == df_test_vals['prediction'], 1, 0)
+        #df_test_vals = df_test_vals.sort_values('id')
+        #df_test_vals = df_test_vals.set_index('id')
 

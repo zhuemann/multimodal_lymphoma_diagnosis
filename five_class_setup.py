@@ -43,46 +43,48 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
     num_3 = 0
     num_4 = 0
 
+    balance_to = 155
+
     for file in all_files:
 
         file_check = file[0:13]
 
         # checks to see if there is an image file and a text file and puts the name of the image with the text and label
-        if reports_1['id'].str.contains(file_check).any():
-            text = get_text(reports_1, file_check)
-            if num_0 < 176:
-                data_with_labels.loc[i] = [file_check, file, text, 0]
-                num_0 += 1
-            else:
-                i = i - 1
-        elif reports_2['id'].str.contains(file_check).any():
+        #if reports_1['id'].str.contains(file_check).any():
+        #    text = get_text(reports_1, file_check)
+        #    if num_0 < balance_to:
+        #        data_with_labels.loc[i] = [file_check, file, text, 0]
+        #        num_0 += 1
+        #    else:
+        #        i = i - 1
+        if reports_2['id'].str.contains(file_check).any():
             text = get_text(reports_2, file_check)
-            if num_1 < 176:
-                data_with_labels.loc[i] = [file_check, file, text, 1]
+            if num_1 < balance_to:
+                data_with_labels.loc[i] = [file_check, file, text, 0]
                 num_1 += 1
             else:
                 i = i - 1
         elif reports_3['id'].str.contains(file_check).any():
             text = get_text(reports_3, file_check)
-            if num_2 < 176:
-                data_with_labels.loc[i] = [file_check, file, text, 2]
+            if num_2 < balance_to:
+                data_with_labels.loc[i] = [file_check, file, text, 1]
                 num_2 += 1
             else:
                 i = i - 1
         elif reports_4['id'].str.contains(file_check).any():
             text = get_text(reports_4, file_check)
-            if num_3 < 176:
-                data_with_labels.loc[i] = [file_check, file, text, 3]
+            if num_3 < balance_to:
+                data_with_labels.loc[i] = [file_check, file, text, 2]
                 num_3 += 1
             else:
                 i = i - 1
-        elif reports_5['id'].str.contains(file_check).any():
-            text = get_text(reports_5, file_check)
-            if num_4 < 176:
-                data_with_labels.loc[i] = [file_check, file, text, 4]
-                num_4 += 1
-            else:
-                i = i - 1
+        #elif reports_5['id'].str.contains(file_check).any():
+        #    text = get_text(reports_5, file_check)
+        #    if num_4 < balance_to:
+        #        data_with_labels.loc[i] = [file_check, file, text, 4]
+        #        num_4 += 1
+        #    else:
+        #        i = i - 1
         else:
             missing_reports += 1
             i = i - 1
