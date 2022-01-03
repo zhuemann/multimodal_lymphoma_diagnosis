@@ -18,13 +18,13 @@ if __name__ == '__main__':
 
     #vit_train()
 
-    local = True
+    local = False
     if local == True:
         directory_base = "Z:/"
     else:
         directory_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"
 
-    DGX = False
+    DGX = True
     if DGX == True:
         directory_base = "/UserData/"
 
@@ -51,22 +51,26 @@ if __name__ == '__main__':
         )
 
 
-    test_mat = [[1,0,0], [0,1,0], [0,0,1]]
-    seeds = [117, 295, 98, 456, 915, 1367, 712]
+    #test_mat = [[1,0,0], [0,1,0], [0,0,1]]
+    #seeds = [456,915,1367, 712]
+    #seeds = [712]
+    #seeds = [1555, 1779, 2001, 2431, 2897, 3194, 4987, 5693 ,6386]
+    seeds = [117,295,98,456,915,1367,712]
     accuracy_list = []
     for seed in seeds:
         #filepath = 'Z:/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx'
-        #filepath = os.path.join(directory_base, '/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx')
+        #print(directory_base)
+        #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx')
         #print(filepath)
         #df = pd.DataFrame(test_mat)
         #df.to_excel(filepath, index=False)
 
-        acc, matrix = multimodal_classification(seed=seed, batch_size=8, epoch=40, dir_base=directory_base, n_classes=3)
+        acc, matrix = multimodal_classification(seed=seed, batch_size=3, epoch=40, dir_base=directory_base, n_classes=5)
         accuracy_list.append(acc)
 
         df = pd.DataFrame(matrix)
         ## save to xlsx file
-        filepath = os.path.join(directory_base, '/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx')
+        filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
 
         df.to_excel(filepath, index=False)
 
