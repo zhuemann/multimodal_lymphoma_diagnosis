@@ -23,6 +23,8 @@ import torchvision.transforms as transforms
 import timm
 from tqdm import tqdm
 
+from efficientnet_pytorch import EfficientNet
+
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from five_class_setup import five_class_image_text_label
 
@@ -51,6 +53,8 @@ class ViTBase16(nn.Module):
     def forward(self, x):
         x = self.model(x)
         return x
+
+
 
 
 class BERTClass(torch.nn.Module):
@@ -403,13 +407,12 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     print("num_5: " + str(num_4_labels.sum()))
 
     
-    save_filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/Redacted_Reports/petlymph_names.xlsx')
-
+    #save_filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/Redacted_Reports/petlymph_names.xlsx')
+    save_filepath = os.path.join(dir_base, '/Zach_Analysis/Redacted_Reports/petlymph_names.xlsx')
+    print("save_filepath: test")
+    print(save_filepath)
     test_df.to_excel(save_filepath, index=False)
     print("after save")
-
-
-
 
 
     # create image augmentations
@@ -510,17 +513,19 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # creates the vit model which gets passed to the multimodal model class
     vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
+    vision_model = EfficientNet.from_pretrained('efficientnet-b0')
+
     # creates the language model which gets passed to the multimodal model class
     language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=1024)
 
     for param in language_model.parameters():
         param.requires_grad = True
 
-    for param in vit_model.parameters():
+    for param in vision_model.parameters():
         param.requires_grad = True
 
     # creates the multimodal modal from the langauge and vision model and moves it to device
-    model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS)
+    model_obj = MyEnsemble(language_model, vision_model, n_classes = N_CLASS) # was vit_model
     model_obj.to(device)
 
     # defines which optimizer is being used

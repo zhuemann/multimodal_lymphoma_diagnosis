@@ -17,3 +17,5 @@ transformers
 umap-learn
 seaborn
 openpyxl
+
+efficientnet_pytorch

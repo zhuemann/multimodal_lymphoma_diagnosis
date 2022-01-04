@@ -18,13 +18,13 @@ if __name__ == '__main__':
 
     #vit_train()
 
-    local = False
+    local = True
     if local == True:
         directory_base = "Z:/"
     else:
         directory_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"
 
-    DGX = True
+    DGX = False
     if DGX == True:
         directory_base = "/UserData/"
 
@@ -70,9 +70,9 @@ if __name__ == '__main__':
 
         df = pd.DataFrame(matrix)
         ## save to xlsx file
-        filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
+        #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
 
-        df.to_excel(filepath, index=False)
+        #df.to_excel(filepath, index=False)
 
     print(accuracy_list)
 
