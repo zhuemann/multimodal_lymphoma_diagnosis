@@ -22,6 +22,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 import timm
 from tqdm import tqdm
+from efficientnet_pytorch import EfficientNet
 
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from five_class_setup import five_class_image_text_label
@@ -99,24 +100,24 @@ class MyEnsemble(nn.Module):
         #self.classifier = nn.Linear(1024, 1)
 
         #put these back in for multimodal learning
-       # self.latent_layer1 = nn.Linear(1768, 1024) #was 2024
-       # self.latent_layer2 = nn.Linear(1024, 1024)
+        self.latent_layer1 = nn.Linear(1768, 1024) #was 2024
+        self.latent_layer2 = nn.Linear(1024, 1024)
 
         #vision ablation
         #self.latent_layer1 = nn.Linear(1000,1024)
         #self.latent_layer2 = nn.Linear(1024, 1024)
 
         #language ablation
-        self.latent_layer1 = nn.Linear(768,1024)
-        self.latent_layer2 = nn.Linear(1024, 1024)
+        #self.latent_layer1 = nn.Linear(768,1024)
+        #self.latent_layer2 = nn.Linear(1024, 1024)
 
         
         
     def forward(self, input_ids, attention_mask, token_type_ids, images):
         x1 = self.language_model(input_ids, attention_mask, token_type_ids)
         x2 = self.vision_model(images)
-        #x = torch.cat((x1, x2), dim=1)
-        x = x1
+        x = torch.cat((x1, x2), dim=1)
+        #x = x1
         #print(x.size())
         # add relu
         x = self.latent_layer1(x)
@@ -338,8 +339,9 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # model specific global variables
     #IMG_SIZE = 224
     IMG_SIZE = 384
+    #IMG_SIZE = 600
     BATCH_SIZE = batch_size
-    LR = 1e-06 #2e-6
+    LR = 8e-5 #1e-4 was for efficient #1e-06 #2e-6 1e-6 for transformer 1e-4 for efficientnet
     GAMMA = 0.7
     N_EPOCHS = epoch #8
     N_CLASS = n_classes
@@ -370,8 +372,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # creates the path to the roberta model used from the bradshaw drive and loads the tokenizer and roberta model
     #roberta_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
     # using bert for now
-    #roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
-    roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
+    roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
+    #roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
 
 
     tokenizer = AutoTokenizer.from_pretrained(roberta_path)
@@ -509,12 +511,15 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     test_loader = DataLoader(test_set, **test_params)
 
     # creates the vit model which gets passed to the multimodal model class
-    vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
+    #vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
+    
+    vit_model = EfficientNet.from_pretrained('efficientnet-b7') #num_classes=2
+    
     # creates the language model which gets passed to the multimodal model class
     language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=1024)
 
     for param in language_model.parameters():
-        param.requires_grad = True
+        param.requires_grad = False
 
     for param in vit_model.parameters():
         param.requires_grad = True
@@ -525,6 +530,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
+
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
@@ -533,9 +539,12 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         fin_outputs = []
         confusion_matrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 
-        if epoch > 40:
+        if epoch > 25:
             for param in model_obj.parameters():
                 param.requires_grad = True
+            for learning_rate in optimizer.param_groups:
+                learning_rate['lr'] = 5e-6#1e-6 for roberta
+
 
         for _, data in tqdm(enumerate(training_loader, 0)):
             ids = data['ids'].to(device, dtype=torch.long)
@@ -633,7 +642,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
             print(confusion_matrix)
             if accuracy >= best_acc:
                 best_acc = accuracy
-                save_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
+                save_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal_forked')
                 #torch.save(model_obj.state_dict(), '/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal')
                 torch.save(model_obj.state_dict(), save_path)
 
@@ -643,7 +652,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     fin_outputs = []
     row_ids = []
     confusion_matrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
-    saved_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
+    saved_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal_forked')
     #model_obj.load_state_dict(torch.load('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal'))
     model_obj.load_state_dict(torch.load(saved_path))
 
