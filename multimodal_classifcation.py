@@ -86,6 +86,7 @@ class BERTClass(torch.nn.Module):
         #pooler = self.pre_classifier(pooler)
         #pooler = torch.nn.Tanh()(pooler)
         #pooler = self.dropout(pooler)
+
         #output = self.classifier(pooler)
 
         output = pooler
