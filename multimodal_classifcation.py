@@ -80,8 +80,6 @@ class BERTClass(torch.nn.Module):
         hidden_state = output_1[0]
         pooler = hidden_state[:, 0]
 
-        print("nan test")
-        print(torch.isnan(pooler).any())
 
         #pooler = self.pre_classifier(pooler)
         #pooler = torch.nn.Tanh()(pooler)
@@ -650,7 +648,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
                 best_acc = accuracy
                 save_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal_forked')
                 #torch.save(model_obj.state_dict(), '/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal')
-                torch.save(model_obj.state_dict(), save_path)
+                #torch.save(model_obj.state_dict(), save_path)
 
 
     model_obj.eval()
