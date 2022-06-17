@@ -33,8 +33,14 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
     reports_4 = pd.read_csv(os.path.join(report_direct, 'ds4_findings_and_impressions_wo_ds_more_syn.csv'))
     reports_5 = pd.read_csv(os.path.join(report_direct, 'ds5_findings_and_impressions_wo_ds_more_syn.csv'))
 
+    confusion_matrix_pngs = pd.read_excel('Z:/Zach_Analysis/Inter_Physician_Agreement_From_Changhee.xlsx')
+    print(confusion_matrix_pngs)
+
+    test_df = pd.DataFrame(columns=['id', 'image_id', 'text', 'label'])
+
     data_with_labels = pd.DataFrame(columns=['id', 'image_id', 'text', 'label'])
     i = 0
+    j = 0
     missing_reports = 0
 
     num_0 = 0
@@ -53,6 +59,12 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
         # checks to see if there is an image file and a text file and puts the name of the image with the text and label
         if reports_1['id'].str.contains(file_check).any():
             text = get_text(reports_1, file_check)
+
+            if confusion_matrix_pngs['MIP'].str.contains(file_check).any():
+                test_df.loc[j] = [file_check, file, text, 0]
+                j = j + 1
+                continue
+
             if num_0 < balance_to:
                 data_with_labels.loc[i] = [file_check, file, text, 0]
                 num_0 += 1
@@ -60,6 +72,12 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
                 i = i - 1
         elif reports_2['id'].str.contains(file_check).any():
             text = get_text(reports_2, file_check)
+
+            if confusion_matrix_pngs['MIP'].str.contains(file_check).any():
+                test_df.loc[j] = [file_check, file, text, 1]
+                j = j + 1
+                continue
+
             if num_1 < balance_to:
                 data_with_labels.loc[i] = [file_check, file, text, 1]
                 num_1 += 1
@@ -67,6 +85,12 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
                 i = i - 1
         elif reports_3['id'].str.contains(file_check).any():
             text = get_text(reports_3, file_check)
+
+            if confusion_matrix_pngs['MIP'].str.contains(file_check).any():
+                test_df.loc[j] = [file_check, file, text, 2]
+                j = j + 1
+                continue
+
             if num_2 < balance_to:
                 data_with_labels.loc[i] = [file_check, file, text, 2]
                 num_2 += 1
@@ -74,6 +98,12 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
                 i = i - 1
         elif reports_4['id'].str.contains(file_check).any():
             text = get_text(reports_4, file_check)
+
+            if confusion_matrix_pngs['MIP'].str.contains(file_check).any():
+                test_df.loc[j] = [file_check, file, text, 3]
+                j = j + 1
+                continue
+
             if num_3 < balance_to:
                 data_with_labels.loc[i] = [file_check, file, text, 3]
                 num_3 += 1
@@ -81,6 +111,12 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
                 i = i - 1
         elif reports_5['id'].str.contains(file_check).any():
             text = get_text(reports_5, file_check)
+
+            if confusion_matrix_pngs['MIP'].str.contains(file_check).any():
+                test_df.loc[j] = [file_check, file, text, 4]
+                j = j + 1
+                continue
+
             if num_4 < balance_to:
                 data_with_labels.loc[i] = [file_check, file, text, 4]
                 num_4 += 1
@@ -92,7 +128,14 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
 
         i += 1
 
+
+    test_df.set_index("id", inplace=True)
+    test_df.to_csv('Z:/Zach_Analysis/confusion_matrix_data/test_data.csv')
+    print("test_df:")
+    print(test_df)
+
     data_with_labels.set_index("id", inplace=True)
+    data_with_labels.to_csv('Z:/Zach_Analysis/confusion_matrix_data/training_valid_data.csv')
     return data_with_labels
 
 

@@ -3,7 +3,7 @@ import pandas as pd
 from transformers import AutoTokenizer, RobertaModel, BertModel
 from transformers import RobertaTokenizer
 from torch.utils.data import Dataset, DataLoader
-
+import torchvision.transforms as transforms
 from sklearn import model_selection
 
 import gc
@@ -19,7 +19,7 @@ from PIL import Image
 #import torch
 import torch.utils.data.dataloader
 import torch.nn as nn
-import torchvision.transforms as transforms
+import torchvision.transforms as transformsf
 import timm
 from tqdm import tqdm
 from efficientnet_pytorch import EfficientNet
@@ -79,6 +79,10 @@ class BERTClass(torch.nn.Module):
 
         hidden_state = output_1[0]
         pooler = hidden_state[:, 0]
+
+        print("nan test")
+        print(torch.isnan(pooler).any())
+
         #pooler = self.pre_classifier(pooler)
         #pooler = torch.nn.Tanh()(pooler)
         #pooler = self.dropout(pooler)
@@ -405,10 +409,10 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     print("num_5: " + str(num_4_labels.sum()))
 
     
-    save_filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/Redacted_Reports/petlymph_names.xlsx')
+    #save_filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/Redacted_Reports/petlymph_names.xlsx')
 
-    test_df.to_excel(save_filepath, index=False)
-    print("after save")
+    #test_df.to_excel(save_filepath, index=False)
+    #print("after save")
 
 
 
@@ -529,6 +533,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     model_obj.to(device)
 
     # defines which optimizer is being used
+    #print(model_obj.parameters)
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
 
     best_acc = -1
