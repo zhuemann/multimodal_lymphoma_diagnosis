@@ -4,16 +4,16 @@ matplotlib
 torch
 torchvision
 timm
-tqdm
+tqdm==4.62.3
 sklearn
 scikit-image
 pandas
 Pillow
-wandb
+#wandb
 
 #NLP packages
 transformers
 
-umap-learn
+#umap-learn
 seaborn
 openpyxl
