@@ -18,13 +18,13 @@ if __name__ == '__main__':
 
     #vit_train()
 
-    local = False
+    local = True
     if local == True:
         directory_base = "Z:/"
     else:
         directory_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"
 
-    DGX = True
+    DGX = False
     if DGX == True:
         directory_base = "/UserData/"
 
