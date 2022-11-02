@@ -151,56 +151,6 @@ def hamming_score(y_true, y_pred, normalize=True, sample_weight=None):
         acc_list.append(tmp_a)
     return np.mean(acc_list)
 
-
-
-#class MIPSDataset(torch.utils.data.Dataset):
-#    """
-#    Helper Class to create the pytorch dataset
-#    """
-
-#   def __init__(self, df, data_path='Z:/Lymphoma_UW_Retrospective/Data/mips/', mode="train", transforms=None):
-#        super().__init__()
-#        self.df_data = df.values
-#        self.data_path = data_path
-#        self.transforms = transforms
-#        self.mode = mode
-
-        #self.data_dir = "train_images" if mode == "train" else "test_images"
-
-#    def __len__(self):
-#        return len(self.df_data)
-
- #   def __getitem__(self, index):
-#        img_name, label = self.df_data[index]
-#        if exists(os.path.join(self.data_path, 'Group_1_2_3_curated', img_name)):
-#            data_dir = "Group_1_2_3_curated"
-#        if exists(os.path.join(self.data_path, 'Group_4_5_curated', img_name)):
-#            data_dir = "Group_4_5_curated"
-#        img_path = os.path.join(self.data_path, data_dir, img_name)
-
-#        try:
-#            img_raw = io.imread(img_path)
-#            img_norm = img_raw * (255 / 65535)
-#            img = Image.fromarray(np.uint8(img_norm)).convert("RGB")
-
-#        except:
-#            print("can't open")
-#            print(img_path)
-
-#       if self.transforms is not None:
-#            image = self.transforms(img)
-#            try:
-                #image = self.transforms(img)
-#                image = self.transforms(img)
-#            except:
-#                print("can't transform")
-#                print(img_path)
-#        else:
-#            image = img
-#
-#        return image, label
-
-
 def loss_fn(outputs, targets):
     print(outputs)
     print(targets)
@@ -240,7 +190,9 @@ class MultiLabelDataset(Dataset):
             None,
             add_special_tokens=True,
             max_length=self.max_len,
-            pad_to_max_length=True,
+            #pad_to_max_length=True,
+            padding='max_length',
+            truncation = 'longest_first',
             return_token_type_ids=True
         )
         ids = inputs['input_ids']
@@ -529,7 +481,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
             optimizer.zero_grad()
             #loss = loss_fn(outputs[:, 0], targets)
             loss = criterion(outputs,targets)
-            if _ % 50 == 0:
+            if _ % 200 == 0:
                 print(f'Epoch: {epoch}, Loss:  {loss.item()}')
 
             optimizer.zero_grad()
