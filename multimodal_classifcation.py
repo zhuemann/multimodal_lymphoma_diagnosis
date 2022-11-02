@@ -560,7 +560,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
             val_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
             
             accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
-            #print(f"valid Hamming Score = {val_hamming_score}\nValid Accuracy = {accuracy}")
+            print(f"Valid Accuracy = {accuracy}")
 
             #print(f"Epoch {str(epoch)}, Validation Hamming Score = {val_hamming_score}")
             #print(f"Epoch {str(epoch)}, Validation Hamming Loss = {val_hamming_loss}")
