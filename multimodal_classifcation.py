@@ -442,31 +442,6 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     valid_set = TextImageDataset(valid_df, tokenizer, 512, transforms = transforms_valid, dir_base = dir_base)
     test_set = TextImageDataset(test_df, tokenizer, 512, transforms = transforms_valid, dir_base = dir_base)
 
-
-    train_loader = torch.utils.data.DataLoader(
-        dataset=training_set,
-        batch_size=BATCH_SIZE,
-        sampler=None,
-        drop_last=True,
-        num_workers=8,
-    )
-
-    valid_loader = torch.utils.data.DataLoader(
-        dataset=valid_set,
-        batch_size=BATCH_SIZE,
-        sampler=None,
-        drop_last=True,
-        num_workers=8,
-    )
-
-    test_loader = torch.utils.data.DataLoader(
-        dataset=test_set,
-        batch_size=BATCH_SIZE,
-        sampler=None,
-        drop_last=True,
-        num_workers=8,
-    )
-
     # probably can delete these
     criterion = nn.CrossEntropyLoss()
     #criterion = nn.MSELoss()
@@ -517,7 +492,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         param.requires_grad = True
 
     for param in vit_model.parameters():
-        param.requires_grad = True
+        param.requires_grad = False
 
     # creates the multimodal modal from the langauge and vision model and moves it to device
     model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS)

@@ -57,7 +57,7 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
                 num_0 += 1
             else:
                 i = i - 1
-        if reports_2['id'].str.contains(file_check).any():
+        elif reports_2['id'].str.contains(file_check).any():
             text = get_text(reports_2, file_check)
             if num_1 < balance_to:
                 data_with_labels.loc[i] = [file_check, file, text, 1]
