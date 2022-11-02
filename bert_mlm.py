@@ -17,11 +17,13 @@ def bert_fine_tuning(dir_base = "Z:/"):
     bert = AutoModelWithLMHead.from_pretrained(model_load_path)
 
 
-    df = pd.read_excel('Z:/Zach_Analysis/text_data/single_ds_reports.xlsx')
+    #df = pd.read_excel('Z:/Zach_Analysis/text_data/single_ds_reports.xlsx')
+    df = pd.read_excel(os.path.join(dir_base, 'Zach_Analysis/text_data/single_ds_reports.xlsx'))
+
 
     #reports_file = 'single_ds_reports.xlsx'
     reports_file = 'findings_and_impressions_wo_ds_more_syn.csv'
-    report_direct = 'Z:/Zach_Analysis/text_data/'
+    report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data/')
     model_direct = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v1/')
 
 
