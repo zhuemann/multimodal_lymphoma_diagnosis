@@ -43,7 +43,7 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
     num_3 = 0
     num_4 = 0
 
-    balance_to = 155
+    balance_to = 15500
 
     for file in all_files:
 
