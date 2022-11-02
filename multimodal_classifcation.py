@@ -403,10 +403,10 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     print("num_5: " + str(num_4_labels.sum()))
 
     
-    save_filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/Redacted_Reports/petlymph_names.xlsx')
+    #save_filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/Redacted_Reports/petlymph_names.xlsx')
 
-    test_df.to_excel(save_filepath, index=False)
-    print("after save")
+    #test_df.to_excel(save_filepath, index=False)
+    #print("after save")
 
 
 
