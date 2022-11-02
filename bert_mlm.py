@@ -8,11 +8,10 @@ from transformers import BertTokenizer, BertModel
 import torch
 
 
-def bert_fine_tuning():
+def bert_fine_tuning(dir_base = "Z:/"):
 
     #tokenizer = AutoTokenizer.from_pretrained('/Users/zmh001/Documents/language_models/bert/')
     #bert = AutoModelWithLMHead.from_pretrained('/Users/zmh001/Documents/language_models/bert/')
-    dir_base = "Z:/"
     model_load_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
     tokenizer = AutoTokenizer.from_pretrained(model_load_path, truncation=True)
     bert = AutoModelWithLMHead.from_pretrained(model_load_path)
