@@ -298,7 +298,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     N_EPOCHS = epoch #8
     N_CLASS = n_classes
     seed = seed
-    #TOKENIZERS_PARALLELISM=True
+    os.environ["TOKENIZERS_PARALLELISM"] = False
 
     # creates the label, text, and image names in a dataframe for 2 class
     #df = get_text_id_labels(dir_base=dir_base)
