@@ -12,7 +12,7 @@ from u_map_embedded_layers import multimodal_u_maps
 from five_class_setup import five_class_image_text_label
 import pandas as pd
 import os
-
+from bert_mlm import bert_fine_tuning
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # test = five_class_image_text_label()
     # print(test)
 
-
+    #bert_fine_tuning()
     # multimodal_classification(dir_base = directory_base, n_classes = 3)
     # multimodal_u_maps(dir_base = directory_base)
     # make_u_map()
@@ -72,7 +72,7 @@ if __name__ == '__main__':
         ## save to xlsx file
         #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_abstract/Used In Abstract/rad_bert_V2/confusion_matrix_seed' + str(
+                                '/UserData/Zach_Analysis/result_logs/for_abstract/Used In Abstract/rad_bert_pretrained_v1/confusion_matrix_seed' + str(
                                     seed) + '.xlsx')
         df.to_excel(filepath, index=False)
 
