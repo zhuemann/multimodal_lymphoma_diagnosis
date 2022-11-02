@@ -23,7 +23,7 @@ import timm
 from tqdm import tqdm
 
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-from make_u_map import make_u_map
+#from make_u_map import make_u_map
 
 
 class ViTBase16(nn.Module):

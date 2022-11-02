@@ -5,7 +5,7 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import pandas as pd
 
-import umap
+#import umap
 import seaborn as sns
 
 #def make_u_map(data, targets):
