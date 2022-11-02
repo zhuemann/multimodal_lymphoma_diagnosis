@@ -24,7 +24,7 @@ if __name__ == '__main__':
     else:
         directory_base = "/home/zmh001/r-fcb-isilon/research/Bradshaw/"
 
-    DGX = False
+    DGX = True
     if DGX == True:
         directory_base = "/UserData/"
 
