@@ -371,12 +371,12 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #roberta_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
     # using bert for now
     #roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
-    roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
+    #roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
 
-
-    tokenizer = AutoTokenizer.from_pretrained(roberta_path)
+    tokenizer = AutoTokenizer.from_pretrained(language_path)
     # roberta_model = RobertaModel.from_pretrained(roberta_path)
-    roberta_model = BertModel.from_pretrained(roberta_path)
+    roberta_model = BertModel.from_pretrained(language_path)
 
     # takes just the last 512 tokens if there are more than 512 tokens in the text
     df = truncate_left_text_dataset(df, tokenizer)
