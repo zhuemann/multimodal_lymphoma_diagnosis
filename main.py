@@ -55,7 +55,8 @@ if __name__ == '__main__':
     #seeds = [456,915,1367, 712]
     #seeds = [712]
     #seeds = [1555, 1779, 2001, 2431, 2897, 3194, 4987, 5693 ,6386]
-    seeds = [117,295,98,456,915,1367,712]
+    #seeds = [117,295,98,456,915,1367,712]
+    seeds = [98, 117, 295, 456, 712, 915, 1367]
     accuracy_list = []
     for seed in seeds:
         #filepath = 'Z:/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx'
@@ -71,7 +72,7 @@ if __name__ == '__main__':
         ## save to xlsx file
         #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/recreate_bert_pretrained_results_v4/confusion_matrix_seed' + str(
+                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/recreate_bert_pretrained_results_v5_5ep/confusion_matrix_seed' + str(
                                     seed) + '.xlsx')
         df.to_excel(filepath, index=False)
 
