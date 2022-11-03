@@ -332,8 +332,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     print(language_path)
     tokenizer = AutoTokenizer.from_pretrained(language_path)
     # roberta_model = RobertaModel.from_pretrained(roberta_path)
-    #roberta_model = BertModel.from_pretrained(language_path)
-    roberta_model = RobertaModel.from_pretrained(language_path)
+    roberta_model = BertModel.from_pretrained(language_path)
+    #roberta_model = RobertaModel.from_pretrained(language_path)
 
     #language_path_pretrained = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v1/')
 
