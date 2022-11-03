@@ -326,7 +326,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # using bert for now
     #roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v1/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v2/')
 
     print(language_path)
     tokenizer = AutoTokenizer.from_pretrained(language_path)
@@ -467,9 +467,9 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         fin_outputs = []
         confusion_matrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 
-        if epoch > 40:
-            for param in model_obj.parameters():
-                param.requires_grad = True
+        #if epoch > 40:
+        #    for param in model_obj.parameters():
+        #        param.requires_grad = True
 
         for _, data in tqdm(enumerate(training_loader, 0)):
             ids = data['ids'].to(device, dtype=torch.long)
@@ -560,7 +560,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
             val_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
             
             accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
-            print(f"Valid Accuracy = {accuracy}")
+            print(f"Epoch: {epoch} Valid Accuracy = {accuracy}")
 
             #print(f"Epoch {str(epoch)}, Validation Hamming Score = {val_hamming_score}")
             #print(f"Epoch {str(epoch)}, Validation Hamming Loss = {val_hamming_loss}")
