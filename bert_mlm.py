@@ -12,7 +12,8 @@ def bert_fine_tuning(dir_base = "Z:/"):
 
     #tokenizer = AutoTokenizer.from_pretrained('/Users/zmh001/Documents/language_models/bert/')
     #bert = AutoModelWithLMHead.from_pretrained('/Users/zmh001/Documents/language_models/bert/')
-    model_load_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
+    model_load_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
+    #model_load_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
     tokenizer = AutoTokenizer.from_pretrained(model_load_path, truncation=True)
     bert = AutoModelWithLMHead.from_pretrained(model_load_path)
 
@@ -24,7 +25,7 @@ def bert_fine_tuning(dir_base = "Z:/"):
     #reports_file = 'single_ds_reports.xlsx'
     reports_file = 'findings_and_impressions_wo_ds_more_syn.csv'
     report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data/')
-    model_direct = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v2/')
+    model_direct = os.path.join(dir_base, 'Zach_Analysis/models/bert_pretrained_recreated/')
 
 
     # first, get the data into correct format -- text blocks.
@@ -76,7 +77,7 @@ def bert_fine_tuning(dir_base = "Z:/"):
         # output_dir='/Users/zmh001/Documents/language_models/trained_models',
         output_dir=model_direct,
         overwrite_output_dir=True,
-        num_train_epochs=2,
+        num_train_epochs=3,
         per_device_train_batch_size=16,
         save_steps=10_000,
         save_total_limit=3,

@@ -326,7 +326,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # using bert for now
     #roberta_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v2/')
+    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v2/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert_pretrained_recreated/')
 
     print(language_path)
     tokenizer = AutoTokenizer.from_pretrained(language_path)
