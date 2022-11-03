@@ -67,7 +67,6 @@ if __name__ == '__main__':
 
         acc, matrix = multimodal_classification(seed=seed, batch_size=8, epoch=65, dir_base=directory_base, n_classes=5)
         accuracy_list.append(acc)
-
         df = pd.DataFrame(matrix)
         ## save to xlsx file
         #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
