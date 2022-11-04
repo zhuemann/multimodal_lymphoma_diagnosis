@@ -85,7 +85,7 @@ class BERTClass(torch.nn.Module):
 
         output = pooler
         #print("language length")
-        print(output.size())
+        #print(output.size())
         return output
 
 
