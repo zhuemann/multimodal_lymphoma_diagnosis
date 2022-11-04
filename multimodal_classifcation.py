@@ -421,12 +421,12 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     train_params = {'batch_size': BATCH_SIZE,
                 'shuffle': True,
-                'num_workers': 4
+                'num_workers': 0
                 }
 
     test_params = {'batch_size': BATCH_SIZE,
                     'shuffle': True,
-                    'num_workers': 4
+                    'num_workers': 0
                     }
 
     # should be able to delete these
