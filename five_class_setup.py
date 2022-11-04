@@ -34,10 +34,10 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
     #reports_5 = pd.read_csv(os.path.join(report_direct, 'ds5_findings_and_impressions_wo_ds_more_syn.csv'))
     report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data/minimal_processed_text')
     reports_1 = pd.read_excel(os.path.join(report_direct, 'ds1_minimal_processing_reports.xlsx'))
-    reports_2 = pd.read_excel(os.path.join(report_direct, 'ds1_minimal_processing_reports.xlsx'))
-    reports_3 = pd.read_excel(os.path.join(report_direct, 'ds1_minimal_processing_reports.xlsx'))
-    reports_4 = pd.read_excel(os.path.join(report_direct, 'ds1_minimal_processing_reports.xlsx'))
-    reports_5 = pd.read_excel(os.path.join(report_direct, 'ds1_minimal_processing_reports.xlsx'))
+    reports_2 = pd.read_excel(os.path.join(report_direct, 'ds2_minimal_processing_reports.xlsx'))
+    reports_3 = pd.read_excel(os.path.join(report_direct, 'ds3_minimal_processing_reports.xlsx'))
+    reports_4 = pd.read_excel(os.path.join(report_direct, 'ds4_minimal_processing_reports.xlsx'))
+    reports_5 = pd.read_excel(os.path.join(report_direct, 'ds5_minimal_processing_reports.xlsx'))
 
     data_with_labels = pd.DataFrame(columns=['id', 'image_id', 'text', 'label'])
     i = 0
