@@ -26,7 +26,8 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
 
     all_files = neg_files + pos_files
 
-    report_direct = os.path.join(dir_base, 'Lymphoma_UW_Retrospective/Reports')
+    #report_direct = os.path.join(dir_base, 'Lymphoma_UW_Retrospective/Reports')
+    report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data/minimal_processed_text')
     reports_1 = pd.read_csv(os.path.join(report_direct, 'ds1_findings_and_impressions_wo_ds_more_syn.csv'))
     reports_2 = pd.read_csv(os.path.join(report_direct, 'ds2_findings_and_impressions_wo_ds_more_syn.csv'))
     reports_3 = pd.read_csv(os.path.join(report_direct, 'ds3_findings_and_impressions_wo_ds_more_syn.csv'))
