@@ -293,7 +293,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #IMG_SIZE = 224
     IMG_SIZE = 384
     BATCH_SIZE = batch_size
-    LR = 1e-6 #5e-6 best#1e-06 #2e-6
+    LR = 5e-6 #5e-6 best#1e-06 #2e-6
     GAMMA = 0.7
     N_EPOCHS = epoch #8
     N_CLASS = n_classes
@@ -327,8 +327,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v2/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
-    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert_pretrained_recreated/')
+    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_base_pretrained_recreated/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert_pretrained_v3/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta/')
 
