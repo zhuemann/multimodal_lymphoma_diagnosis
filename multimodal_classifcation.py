@@ -90,7 +90,7 @@ class BERTClass(torch.nn.Module):
 
 
 class MyEnsemble(nn.Module):
-    def __init__(self, language_model, vision_model, n_classes):
+    def __init__(self, language_model, vision_model, n_classes, n_nodes):
         # for multimodal model
         super(MyEnsemble, self).__init__()
         self.language_model = language_model
@@ -107,7 +107,7 @@ class MyEnsemble(nn.Module):
         #self.latent_layer2 = nn.Linear(1024, 1024)
 
         #language ablation
-        self.latent_layer1 = nn.Linear(1024, 1024)
+        self.latent_layer1 = nn.Linear(n_nodes, 1024)
         self.latent_layer2 = nn.Linear(1024, 1024)
 
         
@@ -328,8 +328,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v2/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
-    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_base_pretrained_recreated/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_large_pretrained_recreated/')
+    #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
 
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert_pretrained_v3/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta/')
@@ -451,7 +451,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # creates the vit model which gets passed to the multimodal model class
     vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
     # creates the language model which gets passed to the multimodal model class
-    language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=1024)
+    language_model_output_dims = 1024
+    language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=language_model_output_dims)
 
     for param in language_model.parameters():
         param.requires_grad = True
@@ -460,7 +461,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         param.requires_grad = False
 
     # creates the multimodal modal from the langauge and vision model and moves it to device
-    model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS)
+    model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS, n_nodes = language_model_output_dims)
     model_obj.to(device)
 
     # defines which optimizer is being used
