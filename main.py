@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # test = five_class_image_text_label()
     # print(test)
 
-    bert_fine_tuning(dir_base=directory_base)
+    #bert_fine_tuning(dir_base=directory_base)
     # multimodal_classification(dir_base = directory_base, n_classes = 3)
     # multimodal_u_maps(dir_base = directory_base)
     # make_u_map()
@@ -72,7 +72,7 @@ if __name__ == '__main__':
         ## save to xlsx file
         #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_base_5e6_lr_v19/confusion_matrix_seed' + str(
+                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_large_5e6_lr_v20/confusion_matrix_seed' + str(
                                     seed) + '.xlsx')
         df.to_excel(filepath, index=False)
 
