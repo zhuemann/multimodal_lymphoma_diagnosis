@@ -107,7 +107,7 @@ class MyEnsemble(nn.Module):
         #self.latent_layer2 = nn.Linear(1024, 1024)
 
         #language ablation
-        self.latent_layer1 = nn.Linear(768, 1024)
+        self.latent_layer1 = nn.Linear(1024, 1024)
         self.latent_layer2 = nn.Linear(1024, 1024)
 
         
