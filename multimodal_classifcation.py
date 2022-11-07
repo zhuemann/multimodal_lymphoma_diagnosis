@@ -451,7 +451,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # creates the vit model which gets passed to the multimodal model class
     vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
     # creates the language model which gets passed to the multimodal model class
-    language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=768)
+    language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=1024)
 
     for param in language_model.parameters():
         param.requires_grad = True
