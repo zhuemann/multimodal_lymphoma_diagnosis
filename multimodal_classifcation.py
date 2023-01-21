@@ -523,7 +523,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            scheduler.step()
+            #scheduler.step()
 
             for i in range(0,outputs.shape[0]):
                 actual = targets[i].detach().cpu().data.numpy()
