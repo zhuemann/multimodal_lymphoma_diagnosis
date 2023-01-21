@@ -20,7 +20,7 @@ def bert_fine_tuning(dir_base = "Z:/"):
 
 
     #df = pd.read_excel('Z:/Zach_Analysis/text_data/single_ds_reports.xlsx')
-    df = pd.read_excel(os.path.join(dir_base, 'Zach_Analysis/text_data/single_ds_reports.xlsx'))
+    df = pd.read_excel(os.path.join(dir_base, 'Zach_Analysis/text_data/single_ds_reports.xlsx', engine="openpyxl"))
 
 
     #reports_file = 'single_ds_reports.xlsx'
