@@ -98,7 +98,7 @@ class LangClassifier(nn.Module):
 
         # language ablation
         self.latent_layer1 = nn.Linear(n_nodes, 1024)  # was 1024
-        self.latent_layer2 = nn.Linear(1024, 1024)
+        self.latent_layer2 = nn.Linear(1024, 768)
 
     def forward(self, input_ids, attention_mask, token_type_ids, images):
         x = self.language_model(input_ids, attention_mask, token_type_ids)
@@ -313,7 +313,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #IMG_SIZE = 224
     IMG_SIZE = 384
     BATCH_SIZE = batch_size
-    LR = 5e-6 #5e-6 #5e-6 best#1e-06 #2e-6
+    LR = 1e-6 #5e-6 #5e-6 best#1e-06 #2e-6
     GAMMA = 0.7
     N_EPOCHS = epoch #8
     N_CLASS = n_classes
