@@ -326,7 +326,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # creates the label, text, and image names in a dataframe for 5 class
     df = five_class_image_text_label(dir_base=dir_base)
-    print(df)
+    #print(df)
     #num_0_labels = (df[["label"]] == 0).any(axis=1)
     #num_1_labels = (df[["label"]] == 1).any(axis=1)
     #num_2_labels = (df[["label"]] == 2).any(axis=1)
@@ -346,7 +346,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # using bert for now
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v4/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v5/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_large_pretrained_recreated/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
@@ -375,18 +375,18 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         test_valid_df, test_size=0.5, random_state=seed, stratify=test_valid_df.label.values
     )
 
-    print(test_df)
+    #print(test_df)
     num_0_labels = (test_df[["label"]] == 0).any(axis=1)
     num_1_labels = (test_df[["label"]] == 1).any(axis=1)
     num_2_labels = (test_df[["label"]] == 2).any(axis=1)
     num_3_labels = (test_df[["label"]] == 3).any(axis=1)
     num_4_labels = (test_df[["label"]] == 4).any(axis=1)
-    print("num_1: " + str(num_0_labels.sum()))
-    print("num_2: " + str(num_1_labels.sum()))
-    print("num_3: " + str(num_2_labels.sum()))
-    print("num_4: " + str(num_3_labels.sum()))
-    print("num_5: " + str(num_4_labels.sum()))
-
+    #print("num_1: " + str(num_0_labels.sum()))
+    #print("num_2: " + str(num_1_labels.sum()))
+    #print("num_3: " + str(num_2_labels.sum()))
+    #print("num_4: " + str(num_3_labels.sum()))
+    #print("num_5: " + str(num_4_labels.sum()))
+    print(f"seed: {seed}")
     
     #save_filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/Redacted_Reports/petlymph_names.xlsx')
 
@@ -439,10 +439,10 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # testing_set = MultiLabelDataset(test_df, tokenizer, 512)
     # valid_set = MultiLabelDataset(valid_df, tokenizer, 512)
 
-    print("FULL Dataset: {}".format(df.shape))
-    print("TRAIN Dataset: {}".format(train_df.shape))
-    print("TEST Dataset: {}".format(test_df.shape))
-    print("VALID Dataset: {}".format(valid_df.shape))
+    #print("FULL Dataset: {}".format(df.shape))
+    #print("TRAIN Dataset: {}".format(train_df.shape))
+    #print("TEST Dataset: {}".format(test_df.shape))
+    #print("VALID Dataset: {}".format(valid_df.shape))
 
     train_params = {'batch_size': BATCH_SIZE,
                 'shuffle': True,

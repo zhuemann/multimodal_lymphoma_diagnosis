@@ -26,7 +26,7 @@ def bert_fine_tuning(dir_base = "Z:/"):
     #reports_file = 'single_ds_reports.xlsx'
     reports_file = 'findings_and_impressions_wo_ds_more_syn.csv'
     report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data/')
-    model_direct = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v4/')
+    model_direct = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v5/')
 
 
     # first, get the data into correct format -- text blocks.
