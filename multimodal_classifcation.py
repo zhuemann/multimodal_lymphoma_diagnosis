@@ -89,6 +89,26 @@ class BERTClass(torch.nn.Module):
         return output
 
 
+class LangClassifier(nn.Module):
+    def __init__(self, language_model, n_classes, n_nodes):
+        # for multimodal model
+        super(LangClassifier, self).__init__()
+        self.language_model = language_model
+        self.classifier = nn.Linear(768, n_classes)  # was 1024
+
+        # language ablation
+        self.latent_layer1 = nn.Linear(n_nodes, 768)  # was 1024
+        self.latent_layer2 = nn.Linear(768, 768)
+
+    def forward(self, input_ids, attention_mask, token_type_ids, images):
+        x = self.language_model(input_ids, attention_mask, token_type_ids)
+        x = self.latent_layer1(x)
+        x = self.latent_layer2(x)
+        x = self.classifier(x)
+        return x
+
+
+
 class MyEnsemble(nn.Module):
     def __init__(self, language_model, vision_model, n_classes, n_nodes):
         # for multimodal model
@@ -461,11 +481,13 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         param.requires_grad = False
 
     # creates the multimodal modal from the langauge and vision model and moves it to device
-    model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS, n_nodes = language_model_output_dims)
+    # model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS, n_nodes = language_model_output_dims)
+    model_obj = LangClassifier(language_model, n_classes = N_CLASS, n_nodes = language_model_output_dims)
     model_obj.to(device)
 
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=2100, eta_min=1e-7, last_epoch=-1,verbose=False)
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
@@ -501,6 +523,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            scheduler.step()
 
             for i in range(0,outputs.shape[0]):
                 actual = targets[i].detach().cpu().data.numpy()
