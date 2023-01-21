@@ -313,7 +313,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #IMG_SIZE = 224
     IMG_SIZE = 384
     BATCH_SIZE = batch_size
-    LR = 5e-6 #5e-6 best#1e-06 #2e-6
+    LR = 5e-6 #5e-6 #5e-6 best#1e-06 #2e-6
     GAMMA = 0.7
     N_EPOCHS = epoch #8
     N_CLASS = n_classes
@@ -487,7 +487,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=2100, eta_min=1e-7, last_epoch=-1,verbose=False)
+    #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=6700, eta_min=1e-7, last_epoch=-1,verbose=False)
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
@@ -523,7 +523,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            scheduler.step()
+            #scheduler.step()
 
             for i in range(0,outputs.shape[0]):
                 actual = targets[i].detach().cpu().data.numpy()
