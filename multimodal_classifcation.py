@@ -94,11 +94,11 @@ class LangClassifier(nn.Module):
         # for multimodal model
         super(LangClassifier, self).__init__()
         self.language_model = language_model
-        self.classifier = nn.Linear(768, n_classes)  # was 1024
+        self.classifier = nn.Linear(1024, n_classes)  # was 1024
 
         # language ablation
         self.latent_layer1 = nn.Linear(n_nodes, 1024)  # was 1024
-        self.latent_layer2 = nn.Linear(1024, 768)
+        self.latent_layer2 = nn.Linear(1024, 1024)
 
     def forward(self, input_ids, attention_mask, token_type_ids, images):
         x = self.language_model(input_ids, attention_mask, token_type_ids)
