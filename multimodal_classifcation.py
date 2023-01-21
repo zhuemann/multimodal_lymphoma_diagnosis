@@ -95,7 +95,7 @@ class MyEnsemble(nn.Module):
         super(MyEnsemble, self).__init__()
         self.language_model = language_model
         self.vision_model = vision_model
-        self.classifier = nn.Linear(1024, n_classes) #was 1024
+        self.classifier = nn.Linear(768, n_classes) #was 1024
         #self.classifier = nn.Linear(1024, 1)
 
         #put these back in for multimodal learning
