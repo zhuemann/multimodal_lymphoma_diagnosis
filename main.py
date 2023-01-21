@@ -13,6 +13,7 @@ from five_class_setup import five_class_image_text_label
 import pandas as pd
 import os
 from bert_mlm import bert_fine_tuning
+import numpy as np
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
@@ -77,4 +78,5 @@ if __name__ == '__main__':
         df.to_excel(filepath, index=False)
 
     print(accuracy_list)
+    print(f"mean accuracy: {np.mean(accuracy_list)}")
 
