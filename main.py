@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # test = five_class_image_text_label()
     # print(test)
 
-    bert_fine_tuning(dir_base=directory_base)
+    # bert_fine_tuning(dir_base=directory_base)
     # multimodal_classification(dir_base = directory_base, n_classes = 3)
     # multimodal_u_maps(dir_base = directory_base)
     # make_u_map()
