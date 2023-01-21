@@ -97,8 +97,8 @@ class LangClassifier(nn.Module):
         self.classifier = nn.Linear(768, n_classes)  # was 1024
 
         # language ablation
-        self.latent_layer1 = nn.Linear(n_nodes, 768)  # was 1024
-        self.latent_layer2 = nn.Linear(768, 768)
+        self.latent_layer1 = nn.Linear(n_nodes, 1024)  # was 1024
+        self.latent_layer2 = nn.Linear(1024, 1024)
 
     def forward(self, input_ids, attention_mask, token_type_ids, images):
         x = self.language_model(input_ids, attention_mask, token_type_ids)
@@ -127,8 +127,8 @@ class MyEnsemble(nn.Module):
         #self.latent_layer2 = nn.Linear(1024, 1024)
 
         #language ablation
-        self.latent_layer1 = nn.Linear(n_nodes, 768) #was 1024
-        self.latent_layer2 = nn.Linear(768, 768)
+        self.latent_layer1 = nn.Linear(n_nodes, 1024) #was 1024
+        self.latent_layer2 = nn.Linear(1024, 1024)
 
         
         
@@ -346,8 +346,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # using bert for now
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v3/')
-    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
+    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v3/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_large_pretrained_recreated/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
 
@@ -487,7 +487,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=6700, eta_min=1e-7, last_epoch=-1,verbose=False)
+    #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=6700, eta_min=1e-7, last_epoch=-1,verbose=False)
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
