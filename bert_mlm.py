@@ -13,8 +13,8 @@ def bert_fine_tuning(dir_base = "Z:/"):
     #tokenizer = AutoTokenizer.from_pretrained('/Users/zmh001/Documents/language_models/bert/')
     #bert = AutoModelWithLMHead.from_pretrained('/Users/zmh001/Documents/language_models/bert/')
     #model_load_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
-    model_load_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
-    #model_load_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
+    #model_load_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
+    model_load_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
     tokenizer = AutoTokenizer.from_pretrained(model_load_path, truncation=True)
     bert = AutoModelWithLMHead.from_pretrained(model_load_path)
 
@@ -26,7 +26,7 @@ def bert_fine_tuning(dir_base = "Z:/"):
     #reports_file = 'single_ds_reports.xlsx'
     reports_file = 'findings_and_impressions_wo_ds_more_syn.csv'
     report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data/')
-    model_direct = os.path.join(dir_base, 'Zach_Analysis/models/roberta_large_pretrained_recreated/')
+    model_direct = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v3/')
 
 
     # first, get the data into correct format -- text blocks.
