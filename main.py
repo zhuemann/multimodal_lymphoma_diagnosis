@@ -32,7 +32,7 @@ if __name__ == '__main__':
     # test = five_class_image_text_label()
     # print(test)
 
-    bert_fine_tuning(dir_base=directory_base)
+    # bert_fine_tuning(dir_base=directory_base)
     # multimodal_classification(dir_base = directory_base, n_classes = 3)
     # multimodal_u_maps(dir_base = directory_base)
     # make_u_map()
@@ -67,13 +67,13 @@ if __name__ == '__main__':
         #df = pd.DataFrame(test_mat)
         #df.to_excel(filepath, index=False)
 
-        acc, matrix = multimodal_classification(seed=seed, batch_size=8, epoch=25, dir_base=directory_base, n_classes=5)
+        acc, matrix = multimodal_classification(seed=seed, batch_size=8, epoch=20, dir_base=directory_base, n_classes=5)
         accuracy_list.append(acc)
         df = pd.DataFrame(matrix)
         ## save to xlsx file
         #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/rad_bert_da_1e5_lr_v25/confusion_matrix_seed' + str(
+                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/rad_bert_da_1e5_lr_v26/confusion_matrix_seed' + str(
                                     seed) + '.xlsx')
         df.to_excel(filepath, index=False)
 
