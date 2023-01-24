@@ -251,8 +251,10 @@ class TextImageDataset(Dataset):
 
         # text extraction
         text = str(self.text[index])
+        print("with numbers:")
         print(text)
         text_num_removed = ''.join([i for i in text if not i.isdigit()])
+        print("no numbers:")
         print(text_num_removed)
         text = " ".join(text_num_removed.split())
 
