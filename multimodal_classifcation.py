@@ -251,7 +251,10 @@ class TextImageDataset(Dataset):
 
         # text extraction
         text = str(self.text[index])
-        text = " ".join(text.split())
+        print(text)
+        text_num_removed = ''.join([i for i in text if not i.isdigit()])
+        print(text_num_removed)
+        text = " ".join(text_num_removed.split())
 
         inputs = self.tokenizer.encode_plus(
             text,
