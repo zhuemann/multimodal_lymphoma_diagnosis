@@ -352,9 +352,10 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bio_clinical_bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v6/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
+    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_large_pretrained_recreated/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_pretrained_v3')
 
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert_pretrained_v3/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta/')
@@ -489,7 +490,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # creates the vit model which gets passed to the multimodal model class
     #vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
     # creates the language model which gets passed to the multimodal model class
-    language_model_output_dims = 768
+    language_model_output_dims = 1024
     language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=language_model_output_dims)
 
     for param in language_model.parameters():
@@ -667,9 +668,9 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         #else:
         #    final_outputs = np.array(fin_outputs) > 0.5
 
-        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/radbert_ai_vs_human_comparison_v30/seed' + str(seed)+'/confusion_matrix_seed' + str(
+        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v31/seed' + str(seed)+'/confusion_matrix_seed' + str(
                                     seed) + '.xlsx')
-        predictions = pd.DataFrame.from_dict(prediction_dic, orient='index', columns=["ds1","ds2","ds3","ds4","ds5", "predicted", "actual" ])
+        predictions = pd.DataFrame.from_dict(prediction_dic, orient='index', columns=["ds1", "ds2", "ds3", "ds4", "ds5", "predicted", "actual" ])
         predictions.to_excel(filepath, index=True)
         print(f"prediction dic: {prediction_dic}")
         test_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
