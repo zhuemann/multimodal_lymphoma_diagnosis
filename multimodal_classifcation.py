@@ -275,6 +275,7 @@ class TextImageDataset(Dataset):
         # images data extraction
         img_name = self.row_ids[index]
         img_name = str(img_name) + "_mip.png"
+        print(self.data_path)
         if exists(os.path.join(self.data_path, 'Group_1_2_3_curated', img_name)):
             data_dir = "Group_1_2_3_curated"
         if exists(os.path.join(self.data_path, 'Group_4_5_curated', img_name)):
