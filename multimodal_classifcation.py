@@ -661,6 +661,9 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         #else:
         #    final_outputs = np.array(fin_outputs) > 0.5
 
+        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/radbert_ai_vs_human_comparison_v30/seed' + str(seed)+'/confusion_matrix_seed' + str(
+                                    seed) + '.xlsx')
+        df.to_excel(filepath, index=False)
         print(f"prediction dic: {prediction_dic}")
         test_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
         accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
