@@ -650,6 +650,9 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
                 #id = str(ids[0].detach().cpu())
                 print(data['row_ids'][i])
                 save_value = outputs[i].detach().cpu().data.numpy()
+                print(save_value)
+                print(predicted)
+                print(actual)
                 save_value = np.concatenate((save_value, predicted))
                 save_value = np.concatenate((save_value, actual))
                 prediction_dic[data['row_ids'][i]] = save_value
