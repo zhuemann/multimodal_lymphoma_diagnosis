@@ -487,7 +487,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     test_loader = DataLoader(test_set, **test_params)
 
     # creates the vit model which gets passed to the multimodal model class
-    vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
+    #vit_model = ViTBase16(n_classes=N_CLASS, pretrained=True, dir_base=dir_base)
     # creates the language model which gets passed to the multimodal model class
     language_model_output_dims = 768
     language_model = BERTClass(roberta_model, n_class=N_CLASS, n_nodes=language_model_output_dims)
@@ -495,8 +495,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     for param in language_model.parameters():
         param.requires_grad = True
 
-    for param in vit_model.parameters():
-        param.requires_grad = False
+    #for param in vit_model.parameters():
+    #    param.requires_grad = False
 
     # creates the multimodal modal from the langauge and vision model and moves it to device
     # model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS, n_nodes = language_model_output_dims)
