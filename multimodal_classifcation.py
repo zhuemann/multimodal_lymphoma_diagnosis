@@ -373,8 +373,9 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         train_df_location = os.path.join(dir_base, 'Zach_Analysis/confusion_matrix_data/train_data_separated.xlsx')
         test_df_location = os.path.join(dir_base, 'Zach_Analysis/confusion_matrix_data/test_data_separated.xlsx')
         train_valid_df = pd.read_excel(train_df_location, engine='openpyxl')
-        print(train_valid_df)
+        train_valid_df.set_index("id", inplace=True)
         test_df = pd.read_excel(test_df_location, engine='openpyxl')
+        test_df.set_index("id", inplace=True)
         # Splits the data into 80% train and 20% valid and test sets
         train_df, valid_df = model_selection.train_test_split(
             train_valid_df, test_size=0.1, random_state=seed, stratify=train_valid_df.label.values
