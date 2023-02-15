@@ -649,7 +649,9 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
                 confusion_matrix[predicted][actual] += 1
                 #id = str(ids[0].detach().cpu())
                 print(data['row_ids'][i])
-                prediction_dic[data['row_ids'][i]] = outputs[i].detach().cpu().data.numpy()
+                save_value = outputs[i].detach().cpu().data.numpy()
+                save_value.append(predicted)
+                prediction_dic[data['row_ids'][i]] = save_value
 
 
         #get the final score
