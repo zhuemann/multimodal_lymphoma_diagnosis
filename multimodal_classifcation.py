@@ -376,7 +376,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         test_df = pd.read_excel(test_df_location, engine='openpyxl')
         # Splits the data into 80% train and 20% valid and test sets
         train_df, valid_df = model_selection.train_test_split(
-            train_valid_df, test_size=0.1, random_state=seed, stratify=df.label.values
+            train_valid_df, test_size=0.1, random_state=seed, stratify=train_valid_df.label.values
         )
 
     else:
