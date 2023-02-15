@@ -75,7 +75,7 @@ if __name__ == '__main__':
         #df = pd.DataFrame(test_mat)
         #df.to_excel(filepath, index=False)
 
-        acc, matrix = multimodal_classification(seed=seed, batch_size=8, epoch=40, dir_base=directory_base, n_classes=5)
+        acc, matrix = multimodal_classification(seed=seed, batch_size=8, epoch=1, dir_base=directory_base, n_classes=5)
         accuracy_list.append(acc)
         df = pd.DataFrame(matrix)
         ## save to xlsx file
