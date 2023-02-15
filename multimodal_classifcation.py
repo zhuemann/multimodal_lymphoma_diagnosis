@@ -647,8 +647,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
                 actual = targets[i].detach().cpu().data.numpy()
                 predicted = outputs.argmax(dim=1)[i].detach().cpu().data.numpy()
                 confusion_matrix[predicted][actual] += 1
-                id = str(ids[0].detach().cpu())
-                print(id)
+                #id = str(ids[0].detach().cpu())
+                print(data['row_ids'][i])
                 prediction_dic[id] = outputs[i].detach().cpu().data.numpy()
 
 
