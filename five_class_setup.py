@@ -26,18 +26,20 @@ def five_class_image_text_label(dir_base = "/home/zmh001/r-fcb-isilon/research/B
 
     all_files = neg_files + pos_files
 
-    report_direct = os.path.join(dir_base, 'Lymphoma_UW_Retrospective/Reports')
-    reports_1 = pd.read_csv(os.path.join(report_direct, 'ds1_findings_and_impressions_wo_ds_more_syn.csv'))
-    reports_2 = pd.read_csv(os.path.join(report_direct, 'ds2_findings_and_impressions_wo_ds_more_syn.csv'))
-    reports_3 = pd.read_csv(os.path.join(report_direct, 'ds3_findings_and_impressions_wo_ds_more_syn.csv'))
-    reports_4 = pd.read_csv(os.path.join(report_direct, 'ds4_findings_and_impressions_wo_ds_more_syn.csv'))
-    reports_5 = pd.read_csv(os.path.join(report_direct, 'ds5_findings_and_impressions_wo_ds_more_syn.csv'))
-    #report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data/minimal_processed_text')
-    #reports_1 = pd.read_excel(os.path.join(report_direct, 'ds1_minimal_processing_reports.xlsx'))
-    #reports_2 = pd.read_excel(os.path.join(report_direct, 'ds2_minimal_processing_reports.xlsx'))
-    #reports_3 = pd.read_excel(os.path.join(report_direct, 'ds3_minimal_processing_reports.xlsx'))
-    #reports_4 = pd.read_excel(os.path.join(report_direct, 'ds4_minimal_processing_reports.xlsx'))
-    #reports_5 = pd.read_excel(os.path.join(report_direct, 'ds5_minimal_processing_reports.xlsx'))
+    #report_direct = os.path.join(dir_base, 'Lymphoma_UW_Retrospective/Reports')
+    #reports_1 = pd.read_csv(os.path.join(report_direct, 'ds1_findings_and_impressions_wo_ds_more_syn.csv'))
+    #reports_2 = pd.read_csv(os.path.join(report_direct, 'ds2_findings_and_impressions_wo_ds_more_syn.csv'))
+    #reports_3 = pd.read_csv(os.path.join(report_direct, 'ds3_findings_and_impressions_wo_ds_more_syn.csv'))
+    #reports_4 = pd.read_csv(os.path.join(report_direct, 'ds4_findings_and_impressions_wo_ds_more_syn.csv'))
+    #reports_5 = pd.read_csv(os.path.join(report_direct, 'ds5_findings_and_impressions_wo_ds_more_syn.csv'))
+    report_direct = os.path.join(dir_base, 'Zach_Analysis/text_data/minimal_processed_text')
+    reports_1_raw = pd.read_excel(os.path.join(report_direct, 'ds1_minimal_processing_reports.xlsx'))
+    reports_2_raw = pd.read_excel(os.path.join(report_direct, 'ds2_minimal_processing_reports.xlsx'))
+    reports_3_raw = pd.read_excel(os.path.join(report_direct, 'ds3_minimal_processing_reports.xlsx'))
+    reports_4_raw = pd.read_excel(os.path.join(report_direct, 'ds4_minimal_processing_reports.xlsx'))
+    reports_5_raw = pd.read_excel(os.path.join(report_direct, 'ds5_minimal_processing_reports.xlsx'))
+
+    #print("reports 1 testing")
 
     data_with_labels = pd.DataFrame(columns=['id', 'image_id', 'text', 'label'])
     i = 0

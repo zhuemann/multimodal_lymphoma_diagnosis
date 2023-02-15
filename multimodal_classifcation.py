@@ -367,18 +367,29 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     #language_path_pretrained = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v1/')
 
+    human_df = True
+    if human_df:
+        train_df_location = os.path.join(dir_base, 'Zach_Analysis/confusion_matrix_data/train_data_separated.xlsx')
+        test_df_location = os.path.join(dir_base, 'Zach_Analysis/confusion_matrix_data/test_data_separated.xlsx')
+        train_valid_df = pd.read_excel(train_df_location, engine='openpyxl')
+        test_df = pd.read_excel(test_df_location, engine='openpyxl')
+        # Splits the data into 80% train and 20% valid and test sets
+        train_df, valid_df = model_selection.train_test_split(
+            train_valid_df, test_size=0.1, random_state=seed, stratify=df.label.values
+        )
 
-    # takes just the last 512 tokens if there are more than 512 tokens in the text
-    df = truncate_left_text_dataset(df, tokenizer)
+    else:
+        # takes just the last 512 tokens if there are more than 512 tokens in the text
+        df = truncate_left_text_dataset(df, tokenizer)
 
-    #Splits the data into 80% train and 20% valid and test sets
-    train_df, test_valid_df = model_selection.train_test_split(
-        df, test_size=0.2, random_state=seed, stratify=df.label.values
-    )
-    #Splits the test and valid sets in half so they are both 10% of total data
-    test_df, valid_df = model_selection.train_test_split(
-        test_valid_df, test_size=0.5, random_state=seed, stratify=test_valid_df.label.values
-    )
+        #Splits the data into 80% train and 20% valid and test sets
+        train_df, test_valid_df = model_selection.train_test_split(
+            df, test_size=0.2, random_state=seed, stratify=df.label.values
+        )
+        #Splits the test and valid sets in half so they are both 10% of total data
+        test_df, valid_df = model_selection.train_test_split(
+            test_valid_df, test_size=0.5, random_state=seed, stratify=test_valid_df.label.values
+        )
 
     #print(test_df)
     num_0_labels = (test_df[["label"]] == 0).any(axis=1)
@@ -615,7 +626,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     saved_path = os.path.join(dir_base, 'Zach_Analysis/models/vit/best_multimodal_modal')
     #model_obj.load_state_dict(torch.load('/home/zmh001/r-fcb-isilon/research/Bradshaw/Zach_Analysis/models/vit/best_multimodal_modal'))
     model_obj.load_state_dict(torch.load(saved_path))
-
+    prediction_dic = {}
     with torch.no_grad():
         for _, data in tqdm(enumerate(test_loader, 0)):
             ids = data['ids'].to(device, dtype = torch.long)
@@ -634,6 +645,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
                 actual = targets[i].detach().cpu().data.numpy()
                 predicted = outputs.argmax(dim=1)[i].detach().cpu().data.numpy()
                 confusion_matrix[predicted][actual] += 1
+                id = str(ids[0].detach().cpu())
+                prediction_dic[id] = outputs[i].detach().cpu().data.numpy()
 
 
         #get the final score
@@ -645,7 +658,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         #else:
         #    final_outputs = np.array(fin_outputs) > 0.5
 
-
+        print(f"prediction dic: {prediction_dic}")
         test_hamming_score = hamming_score(np.array(fin_targets), np.array(final_outputs))
         accuracy = accuracy_score(np.array(fin_targets), np.array(final_outputs))
         print(f"Test Hamming Score = {test_hamming_score}\nTest Accuracy = {accuracy}")

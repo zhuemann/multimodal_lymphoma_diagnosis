@@ -7,19 +7,27 @@ from vit_train import vit_train
 from classification_model_bert_unchanged import fine_tune_model, test_saved_model
 from get_id_label_dataframe import get_id_label_dataframe
 from multimodal_classifcation import multimodal_classification
+from utility import run_deauville_stripping
 #from make_u_map import make_u_map
 from u_map_embedded_layers import multimodal_u_maps
 from five_class_setup import five_class_image_text_label
 import pandas as pd
 import os
 from bert_mlm import bert_fine_tuning
+from utility import run_split_reports_according_to_ds
 import numpy as np
+from utility import find_sentence_matches
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
+    #find_sentence_matches()
+    #print(fail)
     #vit_train()
-
-    local = True
+    #run_deauville_stripping()
+    #print(fail)
+    #run_split_reports_according_to_ds('5-level')
+    #print(fail)
+    local = False
     if local == True:
         directory_base = "Z:/"
     else:
@@ -67,13 +75,13 @@ if __name__ == '__main__':
         #df = pd.DataFrame(test_mat)
         #df.to_excel(filepath, index=False)
 
-        acc, matrix = multimodal_classification(seed=seed, batch_size=8, epoch=20, dir_base=directory_base, n_classes=5)
+        acc, matrix = multimodal_classification(seed=seed, batch_size=8, epoch=1, dir_base=directory_base, n_classes=5)
         accuracy_list.append(acc)
         df = pd.DataFrame(matrix)
         ## save to xlsx file
         #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/rad_bert_all_numbers_removed_1e6_lr_v28/confusion_matrix_seed' + str(
+                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/radbert_ai_vs_human_comparison_v30/confusion_matrix_seed' + str(
                                     seed) + '.xlsx')
         df.to_excel(filepath, index=False)
 
