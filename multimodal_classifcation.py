@@ -354,8 +354,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v6/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_large_pretrained_recreated/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
-    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_pretrained_v3')
+    #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_pretrained_v3')
 
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert_pretrained_v3/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta/')
@@ -668,7 +668,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         #else:
         #    final_outputs = np.array(fin_outputs) > 0.5
 
-        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v31/seed' + str(seed)+'/confusion_matrix_seed' + str(
+        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v32/seed' + str(seed)+'/confusion_matrix_seed' + str(
                                     seed) + '.xlsx')
         predictions = pd.DataFrame.from_dict(prediction_dic, orient='index', columns=["ds1", "ds2", "ds3", "ds4", "ds5", "predicted", "actual" ])
         predictions.to_excel(filepath, index=True)
