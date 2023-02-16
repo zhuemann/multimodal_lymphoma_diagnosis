@@ -506,7 +506,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=7300, eta_min=5e-7, last_epoch=-1,verbose=False)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=7300, eta_min=2e-7, last_epoch=5,verbose=False)
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
