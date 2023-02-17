@@ -253,10 +253,11 @@ class TextImageDataset(Dataset):
         text = str(self.text[index])
         #print("with numbers:")
         #print(text)
-        text_num_removed = ''.join([i for i in text if not i.isdigit()])
+        #text_num_removed = ''.join([i for i in text if not i.isdigit()])
+
         #print("no numbers:")
         #print(text_num_removed)
-        text = " ".join(text_num_removed.split())
+        text = " ".join(text.split())
 
         inputs = self.tokenizer.encode_plus(
             text,
@@ -318,7 +319,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #IMG_SIZE = 224
     IMG_SIZE = 384
     BATCH_SIZE = batch_size
-    LR = 5e-6 #1e-5 #5e-6 #5e-6 #5e-6 best#1e-06 #2e-6
+    LR = 7e-6 #1e-5 #5e-6 #5e-6 #5e-6 best#1e-06 #2e-6
     GAMMA = 0.7
     N_EPOCHS = epoch #8
     N_CLASS = n_classes
@@ -506,7 +507,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=7300, eta_min=2e-7, last_epoch=-1,verbose=False)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=5000, eta_min=5e-7, last_epoch=-1,verbose=False)
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
@@ -668,7 +669,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         #else:
         #    final_outputs = np.array(fin_outputs) > 0.5
 
-        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v34/seed' + str(seed)+'/predictions_seed' + str(
+        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v35/seed' + str(seed)+'/predictions_seed' + str(
                                     seed) + '.xlsx')
         predictions = pd.DataFrame.from_dict(prediction_dic, orient='index', columns=["ds1", "ds2", "ds3", "ds4", "ds5", "predicted", "actual" ])
         predictions.to_excel(filepath, index=True)
