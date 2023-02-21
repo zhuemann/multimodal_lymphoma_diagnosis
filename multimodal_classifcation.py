@@ -507,7 +507,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=5000, eta_min=9e-7, last_epoch=-1,verbose=False)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=5000, eta_min=2e-6, last_epoch=-1,verbose=False) #5e-7
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
@@ -669,7 +669,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
         #else:
         #    final_outputs = np.array(fin_outputs) > 0.5
 
-        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v38/seed' + str(seed)+'/predictions_seed' + str(
+        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v39/seed' + str(seed)+'/predictions_seed' + str(
                                     seed) + '.xlsx')
         predictions = pd.DataFrame.from_dict(prediction_dic, orient='index', columns=["ds1", "ds2", "ds3", "ds4", "ds5", "predicted", "actual" ])
         predictions.to_excel(filepath, index=True)
