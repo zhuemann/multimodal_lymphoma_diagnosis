@@ -99,11 +99,19 @@ class LangClassifier(nn.Module):
         # language ablation
         self.latent_layer1 = nn.Linear(n_nodes, 1024)  # was 1024
         self.latent_layer2 = nn.Linear(1024, 1024)
+        self.dropout1 = nn.Dropout(p=0.2)
+        self.dropout2 = nn.Dropout(p=0.2)
+        self.dropout3 = nn.Dropout(p=0.2)
+
+
 
     def forward(self, input_ids, attention_mask, token_type_ids, images):
         x = self.language_model(input_ids, attention_mask, token_type_ids)
+        x = self.dropout1(x)
         x = self.latent_layer1(x)
+        x = self.dropout2(x)
         x = self.latent_layer2(x)
+        x = self.dropout3(x)
         x = self.classifier(x)
         return x
 
@@ -355,8 +363,8 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v6/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_large_pretrained_recreated/')
-    #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
-    language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_pretrained_v3')
+    language_path = os.path.join(dir_base, 'Zach_Analysis/roberta_large/')
+    #language_path = os.path.join(dir_base, 'Zach_Analysis/models/roberta_pretrained_v3')
 
     #language_path = os.path.join(dir_base, 'Zach_Analysis/models/bert_pretrained_v3/')
     #language_path = os.path.join(dir_base, 'Zach_Analysis/roberta/')
@@ -507,7 +515,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     # defines which optimizer is being used
     optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=7000, eta_min=1e-6, last_epoch=-1,verbose=False) #5e-7
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=7000, eta_min=2e-6, last_epoch=-1,verbose=False) #5e-7
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
         model_obj.train()
