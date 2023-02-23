@@ -68,7 +68,7 @@ if __name__ == '__main__':
     seeds = [98, 117, 295, 456, 712, 915, 1367]
     accuracy_list = []
     #for seed in seeds:
-    lr_list = [1e-3, 1e-4, 5e-4, 1e-5, 5e-6, 1e-6, 5e-7, 1e-8]
+    lr_list = [5e-4, 1e-5, 5e-6, 1e-6, 5e-7, 1e-8]
     for lr in lr_list:
         #filepath = 'Z:/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx'
         #print(directory_base)
