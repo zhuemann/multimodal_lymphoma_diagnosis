@@ -89,8 +89,8 @@ if __name__ == '__main__':
         #                        '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v45/confusion_matrix_seed' + str(
         #                            seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v48/confusion_matrix_lr' + str(
-                                    lr) + '.xlsx')
+                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v48/confusion_matrix_beta' + str(
+                                    beta) + '.xlsx')
         df.to_excel(filepath, index=False)
 
     print(accuracy_list)
