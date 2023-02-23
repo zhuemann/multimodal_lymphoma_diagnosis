@@ -67,22 +67,27 @@ if __name__ == '__main__':
     #seeds = [117,295,98,456,915,1367,712]
     seeds = [98, 117, 295, 456, 712, 915, 1367]
     accuracy_list = []
-    for seed in seeds:
+    #for seed in seeds:
+    lr_list = [1e-3, 1e-4, 5e-4, 1e-5, 5e-6, 1e-6, 5e-7, 1e-8]
+    for lr in lr_list:
         #filepath = 'Z:/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx'
         #print(directory_base)
         #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx')
         #print(filepath)
         #df = pd.DataFrame(test_mat)
         #df.to_excel(filepath, index=False)
-
-        acc, matrix = multimodal_classification(seed=seed, batch_size=16, epoch=30, dir_base=directory_base, n_classes=5)
+        seed = 98
+        acc, matrix = multimodal_classification(seed=seed, batch_size=16, epoch=30, dir_base=directory_base, n_classes=5, LR = lr)
         accuracy_list.append(acc)
         df = pd.DataFrame(matrix)
         ## save to xlsx file
         #filepath = os.path.join(directory_base, '/UserData/Zach_Analysis/result_logs/for_abstract/bio_clinical_bert/confusion_matrix_seed' + str(seed) + '.xlsx')
+        #filepath = os.path.join(directory_base,
+        #                        '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v45/confusion_matrix_seed' + str(
+        #                            seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v45/confusion_matrix_seed' + str(
-                                    seed) + '.xlsx')
+                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v45/confusion_matrix_lr' + str(
+                                    lr) + '.xlsx')
         df.to_excel(filepath, index=False)
 
     print(accuracy_list)
