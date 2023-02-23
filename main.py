@@ -76,7 +76,7 @@ if __name__ == '__main__':
         #print(filepath)
         #df = pd.DataFrame(test_mat)
         #df.to_excel(filepath, index=False)
-        seed = 98
+        seed = 117
         acc, matrix = multimodal_classification(seed=seed, batch_size=16, epoch=30, dir_base=directory_base, n_classes=5, LR = lr)
         accuracy_list.append(acc)
         df = pd.DataFrame(matrix)
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         #                        '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v45/confusion_matrix_seed' + str(
         #                            seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v45/confusion_matrix_lr' + str(
+                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v46/confusion_matrix_lr' + str(
                                     lr) + '.xlsx')
         df.to_excel(filepath, index=False)
 
