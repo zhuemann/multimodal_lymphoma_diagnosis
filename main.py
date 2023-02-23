@@ -68,7 +68,8 @@ if __name__ == '__main__':
     seeds = [98, 117, 295, 456, 712, 915, 1367]
     accuracy_list = []
     #for seed in seeds:
-    lr_list = [5e-4, 1e-5, 5e-6, 1e-6, 5e-7, 1e-8]
+    #lr_list = [5e-4, 1e-5, 5e-6, 1e-6, 5e-7, 1e-8]
+    lr_list = [3e-5, 2e-5, 1e-5, 9e-6, 8e-6, 7e-6]
     for lr in lr_list:
         #filepath = 'Z:/Zach_Analysis/result_logs/confusion_matrix_seed' + str(seed) + '.xlsx'
         #print(directory_base)
@@ -86,7 +87,7 @@ if __name__ == '__main__':
         #                        '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v45/confusion_matrix_seed' + str(
         #                            seed) + '.xlsx')
         filepath = os.path.join(directory_base,
-                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v46/confusion_matrix_lr' + str(
+                                '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v47/confusion_matrix_lr' + str(
                                     lr) + '.xlsx')
         df.to_excel(filepath, index=False)
 
