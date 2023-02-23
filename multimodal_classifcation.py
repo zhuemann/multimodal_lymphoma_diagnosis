@@ -513,9 +513,9 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     # model_obj = MyEnsemble(language_model, vit_model, n_classes = N_CLASS, n_nodes = language_model_output_dims)
     model_obj = LangClassifier(language_model, n_classes = N_CLASS, n_nodes = language_model_output_dims)
     model_obj.to(device)
-
+    betas = (beta1, .999)
     # defines which optimizer is being used
-    optimizer = torch.optim.AdamW(params=model_obj.parameters(), lr=LR)
+    optimizer = torch.optim.AdamW(params=model_obj.parameters(), lr=LR, betas = betas)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=2700, eta_min=5e-7, last_epoch=-1,verbose=False) #5e-7
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
