@@ -378,7 +378,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
     #language_path_pretrained = os.path.join(dir_base, 'Zach_Analysis/models/rad_bert_pretrained_v1/')
 
-    human_df = True
+    human_df = False
     if human_df:
         train_df_location = os.path.join(dir_base, 'Zach_Analysis/confusion_matrix_data/train_data_separated.xlsx')
         test_df_location = os.path.join(dir_base, 'Zach_Analysis/confusion_matrix_data/test_data_separated.xlsx')
@@ -515,7 +515,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
     model_obj.to(device)
     betas = (beta1, beta2)
     # defines which optimizer is being used
-    optimizer = torch.optim.AdamW(params=model_obj.parameters(), lr=LR, betas = betas)
+    optimizer = torch.optim.Adam(params=model_obj.parameters(), lr=LR, betas = betas)
     #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=2700, eta_min=1.5e-6, last_epoch=-1,verbose=False) #5e-7
     best_acc = -1
     for epoch in range(1, N_EPOCHS + 1):
@@ -680,7 +680,7 @@ def multimodal_classification(seed, batch_size=8, epoch=1, dir_base = "/home/zmh
 
         #filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v45/predictions_seed' + str(
         #                            seed) + '.xlsx')
-        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/roberta_ai_vs_human_comparison_v54/predictions_seed' + str(
+        filepath = os.path.join(dir_base, '/UserData/Zach_Analysis/result_logs/for_paper/paper_workspace/radbert_adam_comparison_v55/predictions_seed' + str(
                                     seed) + '.xlsx')
         predictions = pd.DataFrame.from_dict(prediction_dic, orient='index', columns=["ds1", "ds2", "ds3", "ds4", "ds5", "predicted", "actual" ])
         predictions.to_excel(filepath, index=True)
